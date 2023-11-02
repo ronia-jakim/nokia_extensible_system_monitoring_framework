@@ -55,6 +55,27 @@ O MÓJ BOŻE JEST PODCAST O TYM
 www.se-radio.net/podcast/2008-07/episode-104-plugin-architecturesi
 
 
+tutaj robią pluginy z użyciem GTK, ale nie wiem, czy to nam się przyda
+
+https://www.codeproject.com/Articles/389667/Simple-Plug-in-Architecture-in-Plain-C
+
+
+wikipedia <3
+
+https://en.wikipedia.org/wiki/Shared_library
+
+
+jakiś super skomplikowany tutorial? znaczy nie jest skomplikowany, ale ma 5 części i chyba koniec końców nie jest to działający ziomek
+
+https://www.drdobbs.com/cpp/building-your-own-plugin-framework-part/204202899?cid=RSSfeed%255FDDJ%255FCpp
+
+
+ten mega ziomek cpp też robi jakiś tutorial
+
+https://cplusplus.com/articles/48TbqMoL/
+
+
+
 
 
 
