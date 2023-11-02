@@ -45,3 +45,6 @@ https://man7.org/linux/man-pages/man3/dlopen.3.html
 
 ## przy pomocy binarek/interpretowanych jezykow(lua, python, js)
 
+### lua
+https://www.oreilly.com/library/view/creating-solid-apis/9781491986301/ch01.html_chapter
+http://www.troubleshooters.com/codecorn/lua/lua_c_calls_lua.htm
