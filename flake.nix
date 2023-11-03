@@ -1,5 +1,5 @@
 {
-  description = "Development environment for nokia extensible system monitoring framework";
+  description = "Development and Build environment for nokia extensible system monitoring framework";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.05";
