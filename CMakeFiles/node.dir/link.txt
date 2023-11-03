@@ -1,0 +1,1 @@
+/nix/store/3hbxw05vfs6m1155xa6pvribs3bv777n-gcc-wrapper-12.2.0/bin/gcc CMakeFiles/node.dir/computing_node/node.c.o -o node 

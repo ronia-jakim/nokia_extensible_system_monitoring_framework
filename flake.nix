@@ -26,8 +26,15 @@
         default = pkgs.mkShell {
           # The Nix packages provided in the environment
           packages = with pkgs; [
+            # build tools
             cmake # Build system generator
             gcc # The GNU Compiler Collection
+            gnumake # A tool to control the generation of non-source files from sources
+            
+
+            # writing tools
+            ccls # A c/c++ language server powered by clang
+            cmake-language-server # CMake LSP Implementation
           ];
         };
       });
