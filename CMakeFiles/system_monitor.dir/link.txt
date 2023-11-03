@@ -1,1 +1,0 @@
-/nix/store/3hbxw05vfs6m1155xa6pvribs3bv777n-gcc-wrapper-12.2.0/bin/gcc CMakeFiles/system_monitor.dir/system_monitor/system_monitor.c.o -o system_monitor 

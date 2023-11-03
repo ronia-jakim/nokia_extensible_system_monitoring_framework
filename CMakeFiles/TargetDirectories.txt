@@ -1,4 +1,0 @@
-/home/sileanth/nokia_extensible_system_monitoring_framework/CMakeFiles/node.dir
-/home/sileanth/nokia_extensible_system_monitoring_framework/CMakeFiles/monitor.dir
-/home/sileanth/nokia_extensible_system_monitoring_framework/CMakeFiles/edit_cache.dir
-/home/sileanth/nokia_extensible_system_monitoring_framework/CMakeFiles/rebuild_cache.dir
