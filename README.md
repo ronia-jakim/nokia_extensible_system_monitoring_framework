@@ -33,5 +33,16 @@ Wynikiem buildowania powinny być 2 binarki: 'node' oraz 'monitor'
 
 ### Building with nix 
 
-TODO
-na razie można ignorować pliki flake.nix, flake.lock
+Wymagania:
+    nix(z włączonymi flakes https://nixos.wiki/wiki/Flakes)
+
+Build:
+```bash
+    git clone https://github.com/ronia-jakim/nokia_extensible_system_monitoring_framework
+    nix build .#node
+    nix build .#monitor
+```
+Run:
+```bash 
+    nix run .#node //lub monitor zamiast node
+```

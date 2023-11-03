@@ -38,5 +38,31 @@
           ];
         };
       });
+      packages = forAllSystems ({ pkgs }: 
+        let 
+          buildPackage = binName: pkgs.stdenv.mkDerivation rec {
+            pname = binName;
+            version = "0.1.0";
+            src = self;
+            buildInputs = with pkgs; [ cmake gnumake gcc ];
+              
+            configurePhase = ''
+              cmake .
+            '';
+
+            buildPhase = ''
+              make ${binName} 
+            '';
+
+            installPhase = ''
+              mkdir -p $out/bin 
+              mv ${binName} $out/bin
+            '';
+          };
+        in
+        {
+          node = buildPackage "node";
+          monitor = buildPackage "monitor";
+        });
     };
 }
