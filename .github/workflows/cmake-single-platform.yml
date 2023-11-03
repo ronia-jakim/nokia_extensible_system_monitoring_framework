@@ -30,6 +30,14 @@ jobs:
     - name: Build
       # Build your program with the given configuration
       run: cmake --build ${{github.workspace}}/. --config ${{env.BUILD_TYPE}}
+    # upload artifact, game binary
+    - name: Upload computting node binary
+      uses: actions/upload-artifact@v1
+      with:
+        name: upload binary
+        path: ./node
+
+
 
     #- name: Test
     #  working-directory: ${{github.workspace}}/build
