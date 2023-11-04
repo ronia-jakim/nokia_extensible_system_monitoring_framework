@@ -61,8 +61,8 @@
           };
         in
         {
-          node = buildPackage "node";
-          monitor = buildPackage "monitor";
+          client = buildPackage "client";
+          server = buildPackage "server";
         });
     };
 }
