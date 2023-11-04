@@ -1,0 +1,28 @@
+{
+	"cmake" : 
+	{
+		"generator" : 
+		{
+			"multiConfig" : false,
+			"name" : "Unix Makefiles"
+		},
+		"paths" : 
+		{
+			"cmake" : "/nix/store/h8q4r7f1j906rlffj96dlbbmwc9zbirk-cmake-3.25.3/bin/cmake",
+			"cpack" : "/nix/store/h8q4r7f1j906rlffj96dlbbmwc9zbirk-cmake-3.25.3/bin/cpack",
+			"ctest" : "/nix/store/h8q4r7f1j906rlffj96dlbbmwc9zbirk-cmake-3.25.3/bin/ctest",
+			"root" : "/nix/store/h8q4r7f1j906rlffj96dlbbmwc9zbirk-cmake-3.25.3/share/cmake-3.25"
+		},
+		"version" : 
+		{
+			"isDirty" : false,
+			"major" : 3,
+			"minor" : 25,
+			"patch" : 3,
+			"string" : "3.25.3",
+			"suffix" : ""
+		}
+	},
+	"objects" : [],
+	"reply" : {}
+}
