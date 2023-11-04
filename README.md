@@ -24,11 +24,21 @@ Wymagania:
 ```bash
    git clone https://github.com/ronia-jakim/nokia_extensible_system_monitoring_framework
    cd nokia_extensible_system_monitoring_framework 
+   chmod +x build.sh
+   ./build.sh
+```
+
+
+[comment]: # ( stara wersja tworzenia tego projektu
+```bash
+   git clone https://github.com/ronia-jakim/nokia_extensible_system_monitoring_framework
+   cd nokia_extensible_system_monitoring_framework 
    cmake . 
    make all
 ```
+)
 
-Wynikiem buildowania powinny być 2 binarki: 'node' oraz 'monitor'
+Wynikiem buildowania powinny być 2 pliki binarne: 'node' oraz 'monitor'
 
 
 ### Building with nix 
