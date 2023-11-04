@@ -6,4 +6,6 @@ project(nokia_extensible_system_monitoring_framework) # defines project name
 
 add_executable(node.out src/computing_node/node.c)
 add_executable(monitor.out src/system_monitor/monitor.c)
+add_executable(client.out src/client.c)
+add_executable(server.out src/server.c)
 
