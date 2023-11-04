@@ -51,12 +51,12 @@
             '';
 
             buildPhase = ''
-              make ${binName} 
+              make ${binName}.out 
             '';
 
             installPhase = ''
               mkdir -p $out/bin 
-              mv ${binName} $out/bin
+              mv bin/${binName}.out $out/bin/${binName}
             '';
           };
         in
