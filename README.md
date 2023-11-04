@@ -9,6 +9,14 @@ Projekt zespołowy z udziałem
 - Łukasz Magnuszewski
 - Katarzyna Stasińska
 
+## TODO list
+
+[] pierwsza wersja formatu danych
+[x] zalążek systemu budowania
+[] PoC #include<sys/resource.h>
+[x] push czy pull - zostaje push?
+[x] pierwsza wersja serwera i klienta (sukces w komunikacji)
+
 
 ## Building 
 
