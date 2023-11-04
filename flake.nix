@@ -56,7 +56,7 @@
 
             installPhase = ''
               mkdir -p $out/bin 
-              mv bin/${binName}.out $out/bin/${binName}
+              mv ${binName}.out $out/bin/${binName}
             '';
           };
         in
