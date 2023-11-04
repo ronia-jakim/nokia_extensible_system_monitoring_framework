@@ -97,7 +97,7 @@ dkms.conf
 
 
 # cmake ignores
-
+.cmake
 CMakeLists.txt.user
 CMakeCache.txt
 CMakeFiles
