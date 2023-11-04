@@ -28,15 +28,14 @@ Wymagania:
    ./build.sh
 ```
 
-
-[comment]: # ( stara wersja tworzenia tego projektu
+<!---
 ```bash
    git clone https://github.com/ronia-jakim/nokia_extensible_system_monitoring_framework
    cd nokia_extensible_system_monitoring_framework 
    cmake . 
    make all
 ```
-)
+--->
 
 Wynikiem buildowania powinny być 2 pliki binarne: 'node' oraz 'monitor'
 
