@@ -11,9 +11,9 @@ Projekt zespołowy z udziałem
 
 ## TODO list
 
-- [] pierwsza wersja formatu danych - na początku jako dwie biblioteki dla węzła i dla głównego serwera
+- [ ] pierwsza wersja formatu danych - na początku jako dwie biblioteki dla węzła i dla głównego serwera
 - [x] zalążek systemu budowania
-- [] PoC #include<sys/resource.h>
+- [ ] PoC #include<sys/resource.h>
 - [x] push czy pull - zostaje push?
 - [x] pierwsza wersja serwera i klienta (sukces w komunikacji)
 
