@@ -36,6 +36,8 @@ int main() {
     }
     fclose(file);
 
+    system("rm results.json");
+
     
     close(client_socket);
 
