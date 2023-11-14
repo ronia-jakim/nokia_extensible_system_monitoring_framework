@@ -6,4 +6,4 @@ current_time=$(date +%s.%N)
 
 
 # Przekazywanie wartości do programu w C za pomocą potoku
-echo -e "$memory_info\n$current_time" | ./formatowanie
+echo -e "$memory_info\n$current_time" | ./formatowanie.out
