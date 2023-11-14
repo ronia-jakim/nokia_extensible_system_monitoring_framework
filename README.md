@@ -11,7 +11,10 @@ Projekt zespołowy z udziałem
 
 ## TODO list
 
-- [ ] pierwsza wersja formatu danych - na początku jako dwie biblioteki dla węzła i dla głównego serwera
+- [ ] monitorowanie jednego dowolnie wybranego  realnego parametru w systemie (odczytywanie przez kolektor i wysyłanie do centrali)
+- [ ] pierwsza wersja centrali wielozadaniowej (obsługującej wiele kolektorów jednocześnie)
+- [ ] rozszerzenie opisu danych o monitorowanie zasobów dynamicznych (takich jak procesy)
+- [x] pierwsza wersja formatu danych - na początku jako dwie biblioteki dla węzła i dla głównego serwera
 - [x] zalążek systemu budowania
 - [ ] ~~PoC #include<sys/resource.h>~~
 - [x] push czy pull - zostaje push?
