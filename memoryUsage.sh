@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Pobieranie informacji o zużyciu pamięci RAM i czasie wykonania testu
 memory_info=$(free -m | awk 'NR==2 {print $3}')
