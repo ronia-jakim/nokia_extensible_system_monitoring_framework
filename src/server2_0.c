@@ -9,6 +9,7 @@
 
 #define SERVER_PORT 12345
 #define BUFFER_SIZE 256
+#define PULL_TIME 10
 
 void send_info(int client_socket) {
     char message[] = "GATHER_INFO";
@@ -37,7 +38,7 @@ printf("Client connected. Socket: %d\n", client_socket);
 
         // Set up a timeout of 60 seconds
         struct timeval timeout;
-        timeout.tv_sec = 60;
+        timeout.tv_sec = PULL_TIME;
         timeout.tv_usec = 0;
 	  
         int result = select(client_socket + 1, &read_fds, NULL, NULL, &timeout);

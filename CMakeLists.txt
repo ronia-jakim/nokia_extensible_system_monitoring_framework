@@ -6,5 +6,7 @@ project(nokia_extensible_system_monitoring_framework) # defines project name
 
 add_executable(client.out src/client.c)
 add_executable(server.out src/server.c)
-add_executable(formatowanie.out formatowanie.c)
+add_executable(client2.out src/client2_0.c) 
+add_executable(server2.out src/server2_0.c)
+add_executable(formatowanie.out src/formatowanie.c)
 

@@ -6,7 +6,59 @@
 
 #define SERVER_PORT 12345
 #define BUFFER_SIZE 256
+#define CONST_DATA 0
 
+char* format(int parametr, char* parametrName, int id_węzła, int id_pluginu, int time) {
+    int dlugosc_wyniku = snprintf(NULL, 0, "{Headers:{%d,%d,Opis_DATA{%s: int},LIST[{%d,%d}]}}}", id_węzła, id_pluginu, parametrName, time, parametr);
+
+    char* wynik = malloc((dlugosc_wyniku + 1) * sizeof(char));  // +1 na znak końca ciągu '\0'
+
+    if (wynik == NULL) {
+        perror("Błąd alokacji pamięci");
+        exit(EXIT_FAILURE);
+    }
+
+    snprintf(wynik, dlugosc_wyniku + 1, "{Headers:{%d,%d,Opis_DATA{%s: int},LIST[{%d,%d}]}}}", id_węzła, id_pluginu, parametrName, time, parametr);
+
+    return wynik;
+}
+
+
+char* get_data() {
+    char buffer[256];
+    system("./memoryUsage.sh > memory_usage.tmp");
+    FILE *file = fopen("memory_usage.tmp", "r"); 
+    if (fgets(buffer, sizeof(buffer), file) != NULL) {
+        // Konwersja odczytanej wartości na liczbę
+        int memory_usage = atoi(buffer);
+
+        // Odczytanie czasu wykonania z potoku
+        if (fgets(buffer, sizeof(buffer), file) != NULL) {
+            int execution_time = atoi(buffer);
+
+            // Wywołanie funkcji format
+            char* wynik = format(memory_usage, "Ram", 1, 1, execution_time);
+            fclose(file);
+            system("rm memory_usage.tmp");
+            return wynik;
+
+           
+
+        
+        } else {
+            printf("Błąd odczytu czasu wykonania z potoku\n");
+        }
+    } else {
+        printf("Błąd odczytu z potoku\n");
+    }
+
+    char *error_msg = "error";
+    return error_msg;
+}
+
+void send_formated_data(int server_socket, char *fdata) {
+  send(server_socket, fdata, strlen(fdata), 0);
+}
 void send_data(int server_socket) {
     char data[] = "Client data to send";
     send(server_socket, data, strlen(data), 0);
@@ -42,9 +94,15 @@ int main() {
 
         // Check if the received command is "GATHER_INFO"
         if (strcmp(buffer, "GATHER_INFO") == 0) {
-            // Send data to the server
-            send_data(client_socket);
-            memset(buffer, 0, sizeof(buffer)); // Clear the buffer
+            if(CONST_DATA) {
+              // Send data to the server
+              send_data(client_socket);
+              memset(buffer, 0, sizeof(buffer)); // Clear the buffer
+            } else {
+              char *data = get_data();
+              send_formated_data(client_socket, data);
+              free(data);
+            }
         }
 
         // Maybe add a delay to avoid constant checking and reduce CPU usage??
