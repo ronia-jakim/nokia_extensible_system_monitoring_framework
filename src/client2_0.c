@@ -3,6 +3,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <arpa/inet.h>
+#include <unistd.h>
 
 #define SERVER_PORT 12345
 #define BUFFER_SIZE 256
