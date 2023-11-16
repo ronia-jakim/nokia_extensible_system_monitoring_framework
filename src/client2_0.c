@@ -25,7 +25,7 @@ char* format(int parametr, char* parametrName, int id_węzła, int id_pluginu, i
 }
 
 
-char* get_data() {
+char* get_data(int id_node) {
     char buffer[256];
     system("./memoryUsage.sh > memory_usage.tmp");
     FILE *file = fopen("memory_usage.tmp", "r"); 
@@ -38,7 +38,7 @@ char* get_data() {
             int execution_time = atoi(buffer);
 
             // Wywołanie funkcji format
-            char* wynik = format(memory_usage, "Ram", 1, 1, execution_time);
+            char* wynik = format(memory_usage, "Ram", id_node, 1, execution_time);
             fclose(file);
             system("rm memory_usage.tmp");
             return wynik;
@@ -65,7 +65,13 @@ void send_data(int server_socket) {
     send(server_socket, data, strlen(data), 0);
 }
 
-int main() {
+int main(int argc, char* argv[]){
+    int id_node = 0;
+    if(argc >= 2) {
+      id_node = atoi(argv[1]);  
+    };
+
+
     int client_socket = socket(AF_INET, SOCK_STREAM, 0);
     if (client_socket == -1) {
         perror("Client socket error");
@@ -100,7 +106,7 @@ int main() {
               send_data(client_socket);
               memset(buffer, 0, sizeof(buffer)); // Clear the buffer
             } else {
-              char *data = get_data();
+              char *data = get_data(id_node);
               send_formated_data(client_socket, data);
               free(data);
             }
