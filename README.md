@@ -11,9 +11,12 @@ Projekt zespołowy z udziałem
 
 ## TODO list
 
+- [ ] przesyłanie z tagami (GUIDami)
+- [x] dwa różne typy danych
+- [ ] parser
 - [x] monitorowanie jednego dowolnie wybranego  realnego parametru w systemie (odczytywanie przez kolektor i wysyłanie do centrali)
 - [x] pierwsza wersja centrali wielozadaniowej (obsługującej wiele kolektorów jednocześnie)
-- [x] rozszerzenie opisu danych o monitorowanie zasobów dynamicznych (takich jak procesy)
+- [ ] rozszerzenie opisu danych o monitorowanie zasobów dynamicznych (takich jak procesy)
 - [x] pierwsza wersja formatu danych - na początku jako dwie biblioteki dla węzła i dla głównego serwera
 - [x] zalążek systemu budowania
 - [x] ~~PoC #include<sys/resource.h>~~
