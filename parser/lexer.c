@@ -12,8 +12,15 @@ const char COMMA[] = ",";
 const char SQUARE_LBRACE[] = "[";
 const char SQUARE_RBRACE[] = "]";
 const char DELIMITED_STRING[] = "DELIMITED_STRING";
+const char UNKNOWN_IDENTIFIER[] = "UNKNOWN_IDENTIFIER";
 const char NUMBER[] = "NUMBER";
 const char TEOF[] = "EOF";
+const char TRUE[] = "TRUE";
+const char FALSE[] = "FALSE";
+const char JNULL[] = "JNULL";
+const char STRING_TYPE[] = "STRING_TYPE";
+const char INT_TYPE[] = "INT_TYPE";
+
 
 struct token {
     const char* token_type;
@@ -138,11 +145,35 @@ Token lexer_read_number(Lexer *l) {
         exit(42);
     }
 
-    const Token t = {
-        .token_string = token_string,
-        .token_type = NUMBER,
-        .token_length = token_length
-    };
+    return new_token(NUMBER, token_string);
+}
+
+bool is_starting_char_of_ident(const char c) {
+    return isalpha(c);
+}
+bool is_middle_char_of_ident(const char c) {
+    return isalpha(c) || c == '_';
+}
+
+const char* recognize_identifier(const char* ident) { //TODO , na razie placeholder bo coś nie działało
+    if(ident[0] == 'I') return INT_TYPE;
+    if(ident[0] == 'S') return STRING_TYPE;
+    if(ident[0] == 'J') return JNULL;
+    if(ident[0] == 't') return TRUE;
+    if(ident[0] == 'f') return FALSE;
+
+    return UNKNOWN_IDENTIFIER;
+}
+
+Token lexer_read_identifier(Lexer *l) {
+    const int starting_pos = l->position;
+    do {
+        lexer_read_char(l);
+    } while(is_middle_char_of_ident(l->current_char));
+    const int token_length = (l->position - starting_pos );
+    char* token_string = lexer_copy_string(l, starting_pos, token_length);
+
+    const Token t = new_token(recognize_identifier(token_string), token_string);
     return t;
 }
 
@@ -172,6 +203,9 @@ Token lexer_next_token(Lexer *l) {
         default:
             if(l->current_char == '-' || isdigit(l->current_char)) {
                 return lexer_read_number(l);
+            }
+            if(is_starting_char_of_ident(l->current_char)) {
+                return lexer_read_identifier(l);
             }
             t = new_simple_token(TEOF);
     }
@@ -208,7 +242,7 @@ void print_all_tokens(Lexer *l) {
 
 
 int main() {
-    char input_string[] = "\"123\"\"as\"  425 13\"ab\" -12 -3";
+    char input_string[] = "\"123\"\"as\"  425 13\"ab\" -12 -3 STRING_TYPE INT_TYPE3 true false JNULL ABC";
     Lexer l = new_lexer(input_string);
 
     print_all_tokens(&l);
