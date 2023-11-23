@@ -13,7 +13,7 @@ Projekt zespołowy z udziałem
 
 - [ ] przesyłanie z tagami (GUIDami)
 - [x] dwa różne typy danych
-- [ ] parser
+- [x] parser
 - [x] monitorowanie jednego dowolnie wybranego  realnego parametru w systemie (odczytywanie przez kolektor i wysyłanie do centrali)
 - [x] pierwsza wersja centrali wielozadaniowej (obsługującej wiele kolektorów jednocześnie)
 - [ ] rozszerzenie opisu danych o monitorowanie zasobów dynamicznych (takich jak procesy)

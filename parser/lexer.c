@@ -1,33 +1,56 @@
+//
+// Created by sileanth on 23.11.23.
+//
+
+
 #include <ctype.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+#include "lexer.h"
 
-const char LBRACE[] = "{";
-const char RBRACE[] = "{";
-const char SEMICOLON[] = ":";
-const char COMMA[] = ",";
-const char SQUARE_LBRACE[] = "[";
-const char SQUARE_RBRACE[] = "]";
-const char DELIMITED_STRING[] = "DELIMITED_STRING";
-const char UNKNOWN_IDENTIFIER[] = "UNKNOWN_IDENTIFIER";
-const char NUMBER[] = "NUMBER";
-const char TEOF[] = "EOF";
-const char TRUE[] = "TRUE";
-const char FALSE[] = "FALSE";
-const char JNULL[] = "JNULL";
-const char STRING_TYPE[] = "STRING_TYPE";
-const char INT_TYPE[] = "INT_TYPE";
+const int TOKEN_LBRACE = 0;
+const int TOKEN_RBRACE = 1;
+const int TOKEN_SEMICOLON = 2;
+const int TOKEN_COMMA = 3;
+const int TOKEN_SQUARE_LBRACE = 4;
+const int TOKEN_SQUARE_RBRACE = 5;
+const int TOKEN_DELIMITED_STRING = 6;
+const int TOKEN_UNKNOWN_IDENTIFIER = 7;
+const int TOKEN_NUMBER = 8;
+const int TOKEN_EOF = 9;
+const int TOKEN_TRUE = 10;
+const int TOKEN_FALSE = 11;
+const int TOKEN_NULL = 12;
+const int TOKEN_STRING_TYPE = 13;
+const int TOKEN_INT_TYPE = 14;
 
 
-struct token {
-    const char* token_type;
-    char* token_string;
-    int token_length;
+
+
+
+const char* const TOKEN_TYPE_TO_STRING[] = {
+    "{",
+    "}",
+    ":",
+    ",",
+    "[",
+    "]",
+    "delimitied_string",
+    "unknown_identifier",
+    "number",
+    "eof",
+    "true",
+    "false",
+    "null",
+    "string_type",
+    "int_type",
 };
-typedef struct token Token;
+
+
+
 
 void free_token_members(Token t) {
     free(t.token_string);
@@ -35,22 +58,13 @@ void free_token_members(Token t) {
 }
 
 char* token_string(const Token t) {
-    char temp_res[strlen(t.token_string) * 3 + strlen(t.token_type) + 10];
-    sprintf(temp_res, "TOKEN_TYPE: %s\nTOKEN_LENGTH: %i\nTOKEN:\n%s", t.token_type, t.token_length, t.token_string);
+    char temp_res[strlen(t.token_string) * 3 + strlen(TOKEN_TYPE_TO_STRING[t.token_type]) + 10];
+    sprintf(temp_res, "TOKEN_TYPE: %s\nTOKEN_LENGTH: %i\nTOKEN:\n%s", TOKEN_TYPE_TO_STRING[t.token_type], t.token_length, t.token_string);
     char* res = malloc(sizeof(char) * (strlen(temp_res) + 1));
     strcpy(res, temp_res);
     return res;
 }
-struct lexer {
-    char* input;
-    int input_length;
 
-    int position;
-    int read_postion;
-
-    char current_char;
-};
-typedef struct lexer Lexer;
 void free_lexer_members(Lexer l) {
     free(l.input);
     l.input = NULL;
@@ -80,7 +94,7 @@ Lexer new_lexer(char* input) {
     return l;
 }
 
-Token new_token(const char* token_type, char* token_string) {
+Token new_token(const int token_type, char* token_string) {
     const Token t = {
         .token_type = token_type,
         .token_string = token_string,
@@ -89,9 +103,9 @@ Token new_token(const char* token_type, char* token_string) {
     return t;
 }
 
-Token new_simple_token(const char* token_type) {
-    char* token_string = malloc(sizeof(char) * (strlen(token_type) + 1));
-    strcpy(token_string, token_type);
+Token new_simple_token(const int token_type) {
+    char* token_string = malloc(sizeof(char) * (strlen(TOKEN_TYPE_TO_STRING[token_type]) + 1));
+    strcpy(token_string, TOKEN_TYPE_TO_STRING[token_type]);
     return new_token(token_type, token_string);
 }
 
@@ -122,7 +136,7 @@ Token lexer_read_delimited_string(Lexer *l) {
 
 
     Token t;
-    t.token_type = DELIMITED_STRING;
+    t.token_type = TOKEN_DELIMITED_STRING;
     t.token_length = (l->position - starting_pos );
     char* token_string = lexer_copy_string(l, starting_pos, t.token_length);
 
@@ -145,7 +159,7 @@ Token lexer_read_number(Lexer *l) {
         exit(42);
     }
 
-    return new_token(NUMBER, token_string);
+    return new_token(TOKEN_NUMBER, token_string);
 }
 
 bool is_starting_char_of_ident(const char c) {
@@ -155,14 +169,14 @@ bool is_middle_char_of_ident(const char c) {
     return isalpha(c) || c == '_';
 }
 
-const char* recognize_identifier(const char* ident) { //TODO , na razie placeholder bo coś nie działało
-    if(ident[0] == 'I') return INT_TYPE;
-    if(ident[0] == 'S') return STRING_TYPE;
-    if(ident[0] == 'J') return JNULL;
-    if(ident[0] == 't') return TRUE;
-    if(ident[0] == 'f') return FALSE;
+int recognize_identifier(const char* ident) { //TODO , na razie placeholder bo coś nie działało
+    if(ident[0] == 'I') return TOKEN_INT_TYPE;
+    if(ident[0] == 'S') return TOKEN_STRING_TYPE;
+    if(ident[0] == 'J') return TOKEN_NULL;
+    if(ident[0] == 't') return TOKEN_TRUE;
+    if(ident[0] == 'f') return TOKEN_FALSE;
 
-    return UNKNOWN_IDENTIFIER;
+    return TOKEN_UNKNOWN_IDENTIFIER;
 }
 
 Token lexer_read_identifier(Lexer *l) {
@@ -184,22 +198,25 @@ Token lexer_next_token(Lexer *l) {
     lexer_eat_whitespace(l);
     switch(l->current_char) {
         case '{':
-            t = new_simple_token(LBRACE);
+            t = new_simple_token(TOKEN_LBRACE);
             break;
         case '}':
-            t = new_simple_token(RBRACE);
+            t = new_simple_token(TOKEN_RBRACE);
             break;
         case '[':
-            t = new_simple_token(SQUARE_LBRACE);
+            t = new_simple_token(TOKEN_SQUARE_LBRACE);
             break;
         case ']':
-            t = new_simple_token(SQUARE_RBRACE);
+            t = new_simple_token(TOKEN_SQUARE_RBRACE);
             break;
         case ':':
-            t = new_simple_token(SEMICOLON);
+            t = new_simple_token(TOKEN_SEMICOLON);
             break;
         case '"':
             return lexer_read_delimited_string(l);
+        case ',':
+            t = new_simple_token(TOKEN_COMMA);
+            break;
         default:
             if(l->current_char == '-' || isdigit(l->current_char)) {
                 return lexer_read_number(l);
@@ -207,7 +224,7 @@ Token lexer_next_token(Lexer *l) {
             if(is_starting_char_of_ident(l->current_char)) {
                 return lexer_read_identifier(l);
             }
-            t = new_simple_token(TEOF);
+            t = new_simple_token(TOKEN_EOF);
     }
     lexer_read_char(l);
     return t;
@@ -220,7 +237,7 @@ void lexer_handle_all(Lexer *l, void (*handlerPrt)(const Token)) {
         t = lexer_next_token(l);
         handlerPrt(t);
         free_token_members(t);
-    } while(t.token_type != TEOF);
+    } while(t.token_type != TOKEN_EOF);
 }
 
 void lexer_handle_all_take_ownership(Lexer *l, void (*handlerPrt)(Token)) {
@@ -228,7 +245,7 @@ void lexer_handle_all_take_ownership(Lexer *l, void (*handlerPrt)(Token)) {
     do {
         t = lexer_next_token(l);
         handlerPrt(t);
-    } while(t.token_type != TEOF);
+    } while(t.token_type != TOKEN_EOF);
 }
 
 void handler(const Token t) {
@@ -241,8 +258,8 @@ void print_all_tokens(Lexer *l) {
 
 
 
-int main() {
-    char input_string[] = "\"123\"\"as\"  425 13\"ab\" -12 -3 STRING_TYPE INT_TYPE3 true false JNULL ABC";
+void test() {
+    char input_string[] = " , ";
     Lexer l = new_lexer(input_string);
 
     print_all_tokens(&l);
