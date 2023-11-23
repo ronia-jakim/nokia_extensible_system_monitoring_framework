@@ -11,6 +11,12 @@ Projekt zespołowy z udziałem
 
 ## TODO list
 
+- [ ] ustalenie terminologii na moduł centralny i moduły brzegowe
+- [ ] (w niedalekiej przyszłości) problem recv/send (buforowanie nieprzeżartych bajtów)
+- [ ] opracowanie systemu pluginów na komendach, jakiś trzeci parametr
+- [ ] zapisywanie danych przychodzących np. do pliku 
+- [ ] przesyłanie wszystkich znanych wskaźników jednocześnie
+- [ ] integracja parsera (metadanych i danych)
 - [x] przesyłanie z tagami (GUIDami)
 - [x] dwa różne typy danych
 - [x] parser
