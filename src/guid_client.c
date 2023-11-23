@@ -8,8 +8,8 @@
 #define SERVER_PORT 12345
 #define BUFFER_SIZE 256
 #define CONST_DATA 0
-const ram_guid = 0;
-const cpu_guid = 1;
+const int ram_guid = 0;
+const int cpu_guid = 1;
 
 char* format(int parametr, char* parametrName, int id_węzła, int id_pluginu, int time) {
     int dlugosc_wyniku = snprintf(NULL, 0, "{Headers:{%d,%d,Opis_DATA{%s: int},LIST[{%d,%d}]}}}", id_węzła, id_pluginu, parametrName, time, parametr);
@@ -87,7 +87,7 @@ char* get_data_ram(int id_node) {
             int execution_time = atoi(buffer);
 
             // Wywołanie funkcji format
-            char* wynik = format(memory_usage, "Ram", id_node, 1, execution_time, ram_guid);
+            char* wynik = format_with_guid(memory_usage, "Ram", id_node, 1, execution_time, ram_guid);
             fclose(file);
             system("rm memory_usage.tmp");
             return wynik;
@@ -108,8 +108,8 @@ char* get_data_ram(int id_node) {
 
 char* get_data_cpu(int id_node) {
     char buffer[256];
-    system("./memoryUsage.sh > memory_usage.tmp");
-    FILE *file = fopen("memory_usage.tmp", "r"); 
+    system("./cpu.sh > cpu.tmp");
+    FILE *file = fopen("cpu.tmp", "r"); 
     if (fgets(buffer, sizeof(buffer), file) != NULL) {
         // Konwersja odczytanej wartości na liczbę
         int memory_usage = atoi(buffer);
@@ -119,9 +119,9 @@ char* get_data_cpu(int id_node) {
             int cpu_usage = atoi(buffer);
 
             // Wywołanie funkcji format
-            char* wynik = format(memory_usage, "CPU", id_node, 1, cpu_usage, cpu_guid);
+            char* wynik = format_with_guid(memory_usage, "CPU", id_node, 1, cpu_usage, cpu_guid);
             fclose(file);
-            system("rm memory_usage.tmp");
+            system("rm cpu.tmp");
             return wynik;
 
            
@@ -151,10 +151,10 @@ int main(int argc, char* argv[]){
     int guid = ram_guid;
     if(argc >= 2) {
       id_node = atoi(argv[1]);  
-    };
+    }
     if(argc >= 3) {
-        guid = atoi[argv[2]);
-    };
+        guid = atoi(argv[2]);
+    }
 
 
     int client_socket = socket(AF_INET, SOCK_STREAM, 0);
