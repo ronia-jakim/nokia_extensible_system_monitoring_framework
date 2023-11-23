@@ -152,7 +152,7 @@ int main(int argc, char* argv[]){
     if(argc >= 2) {
       id_node = atoi(argv[1]);  
     }
-    if(argc >= 3) {
+    if(argc >= 3) { //if guid=0, client sends ram, if guid=1 client sends cpu
         guid = atoi(argv[2]);
     }
 

@@ -11,7 +11,7 @@ Projekt zespołowy z udziałem
 
 ## TODO list
 
-- [ ] przesyłanie z tagami (GUIDami)
+- [x] przesyłanie z tagami (GUIDami)
 - [x] dwa różne typy danych
 - [x] parser
 - [x] monitorowanie jednego dowolnie wybranego  realnego parametru w systemie (odczytywanie przez kolektor i wysyłanie do centrali)
