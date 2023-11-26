@@ -1,7 +1,3 @@
-//
-// Created by sileanth on 23.11.23.
-//
-
 #ifndef LEXER_H
 #define LEXER_H
 

@@ -1,7 +1,3 @@
-//
-// Created by sileanth on 23.11.23.
-//
-
 #include "parser.h"
 
 #include <assert.h>
@@ -626,7 +622,7 @@ bool gen_table(Node* config,  DataDesc* ddesc, int* length) {
 
 void test_parser() {
 
-    char input_string[] = "{ \" a\" : [ INT ], \"b\" : STRING }";
+    char input_string[] = "{ \"a\" : [ { \"first\": INT, \"second\": SECOND } ], \"b\" : STRING , \"c\": { \"a\": [ STRING] }}";
     Lexer l = new_lexer(input_string);
   //  print_all_tokens(&l);
   //  return 0;

@@ -1,6 +1,4 @@
-//
-// Created by sileanth on 23.11.23.
-//
+
 
 #ifndef PARSER_H
 #define PARSER_H
