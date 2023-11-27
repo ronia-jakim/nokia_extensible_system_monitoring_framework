@@ -1,0 +1,2 @@
+﻿0 float CPU mpstat| awk '$12 ~ /[0-9.]+/ { print 100-$12,strftime("\n%H:%M:%S") }'
+1 int RAM echo "$(free -m | awk 'NR==2 {print $3}')" "$(date +'%H:%M:%S')"
