@@ -13,7 +13,7 @@ Projekt zespołowy z udziałem
 
 - [ ] ustalenie terminologii na moduł centralny i moduły brzegowe
 - [ ] (w niedalekiej przyszłości) problem recv/send (buforowanie nieprzeżartych bajtów)
-- [ ] opracowanie systemu pluginów na komendach, jakiś trzeci parametr
+- [ ] opracowanie systemu pluginów na komendach
 - [ ] zapisywanie danych przychodzących np. do pliku 
 - [ ] przesyłanie wszystkich znanych wskaźników jednocześnie
 - [ ] integracja parsera (metadanych i danych)
