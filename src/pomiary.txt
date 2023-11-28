@@ -1,0 +1,97 @@
+{Headers:{69,1,Opis_DATA{CPU: float},LIST[{14:47:39
+,4358}]}}
+{Headers:{69,1,Opis_DATA{CPU: int},LIST[{
+14:47:40
+,100}]}}}}
+{Headers:{69,1,Opis_DATA{CPU: float},LIST[{14:48:36
+,4407}]}}
+{Headers:{69,1,Opis_DATA{CPU: float},LIST[{14:48:39
+,4396}]}}
+{Headers:{69,1,Opis_DATA{CPU: int},LIST[{
+14:48:40
+,100}]}}
+{Headers:{69,1,Opis_DATA{CPU: float},LIST[{14:49:16
+,4413}]}}
+{Headers:{69,1,Opis_DATA{CPU: int},LIST[{
+14:49:17
+,100}]}}}}
+{Headers:{69,1,Opis_DATA{RAM: float},LIST[{14:49:36
+,4436}]}}
+{Headers:{69,1,Opis_DATA{CPU: int},LIST[{
+14:49:37
+,100}]}}}}
+{Headers:{69,1,Opis_DATA{RAM: float},LIST[{14:50:00
+,4444}]}}
+{Headers:{69,1,Opis_DATA{CPU: int},LIST[{
+14:50:01
+,100}]}}}}
+{Headers:{69,1,Opis_DATA{RAM: float},LIST[{14:50:50
+,4498}]}}
+{Headers:{69,1,Opis_DATA{CPU: int},LIST[{
+14:50:51
+,100}]}}}}
+{Headers:{69,1,Opis_DATA{RAM: float},LIST[{14:51:49
+,4251}]}}
+{Headers:{69,1,Opis_DATA{CPU: int},LIST[{
+14:51:50
+,100}]}}}}
+{Headers:{69,1,Opis_DATA{RAM: float},LIST[{14:52:20
+,4209}]}}
+{Headers:{69,1,Opis_DATA{CPU: int},LIST[{
+14:52:22
+,100}]}}}}
+{Headers:{69,1,Opis_DATA{RAM: float},LIST[{14:52:59
+,4235}]}}
+{Headers:{69,1,Opis_DATA{CPU: int},LIST[{
+14:53:01
+,100}]}}}}
+{Headers:{69,1,Opis_DATA{RAM: float},LIST[{14:54:06
+,4272}]}}
+{Headers:{69,1,Opis_DATA{CPU: int},LIST[{
+14:54:08
+,100}]}}}}
+{Headers:{69,1,Opis_DATA{RAM: float},LIST[{14:54:39
+,4296}]}}
+{Headers:{69,1,Opis_DATA{CPU: int},LIST[{
+14:54:41
+,100}]}}}}
+{Headers:{69,1,Opis_DATA{RAM: float},LIST[{14:55:09
+,4324}]}}
+{Headers:{69,1,Opis_DATA{CPU: int},LIST[{
+14:55:11
+,100}]}}}}
+{Headers:{69,1,Opis_DATA{RAM: float},LIST[{14:55:49
+,4386}]}}
+{Headers:{69,1,Opis_DATA{CPU: int},LIST[{
+14:55:51
+,100}]}}}}
+{Headers:{69,1,Opis_DATA{RAM: float},LIST[{14:56:22
+,4220}]}}
+{Headers:{69,1,Opis_DATA{CPU: int},LIST[{
+14:56:24
+,100}]}}}}
+{Headers:{69,1,Opis_DATA{RAM: float},LIST[{14:56:51
+,4298}]}}
+{Headers:{69,1,Opis_DATA{CPU: int},LIST[{
+14:56:53
+,100}]}}}}
+{Headers:{69,1,Opis_DATA{RAM: float},LIST[{14:57:26
+,4242}]}}
+{Headers:{69,1,Opis_DATA{CPU: int},LIST[{
+14:57:28
+,100}]}}}}
+{Headers:{69,1,Opis_DATA{RAM: float},LIST[{14:57:59
+,4302}]}}
+{Headers:{69,1,Opis_DATA{CPU: int},LIST[{
+14:58:01
+,100}]}}}}
+{Headers:{69,1,Opis_DATA{RAM: float},LIST[{14:58:30
+,4257}]}}
+{Headers:{69,1,Opis_DATA{CPU: int},LIST[{
+14:58:32
+,100}]}}}}
+{Headers:{69,1,Opis_DATA{RAM: float},LIST[{15:00:55
+,4437}]}}
+{Headers:{69,1,Opis_DATA{CPU: int},LIST[{
+15:00:57
+,100}]}}}}

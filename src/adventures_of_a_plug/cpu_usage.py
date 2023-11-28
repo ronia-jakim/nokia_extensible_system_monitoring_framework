@@ -8,7 +8,11 @@ def execute_command(command):
     result = subprocess.run(command, shell=True, stdout=subprocess.PIPE)
     return result.stdout.decode()
 
+
+#print("test")
+
 while True:
+    #print("test2\0")
     s = input()
 
     cmd = r'''mpstat| awk '$12 ~ /[0-9.]+/ { print 100-$12,strftime("\n%H:%M:%S") }' '''
@@ -20,5 +24,5 @@ while True:
         parameter, time = result.split(' ')
         parameter_name = "CPU"
             
-        print(f"{{Headers:{{{69},{PLUGIN_ID},Opis_DATA{{{parameter_name}: {type}}},LIST[{{{time},{parameter}}}]}}}}")
+        print(f"{{Headers:{{{69},{PLUGIN_ID},Opis_DATA{{{parameter_name}: {type}}},LIST[{{{time},{parameter}}}]}}}}", end="")
 

@@ -8,7 +8,11 @@ def execute_command(command):
     result = subprocess.run(command, shell=True, stdout=subprocess.PIPE)
     return result.stdout.decode()
 
+
+#print("TEST")
+
 while True:
+    #print("test\0")
     s = input()
 
     cmd = r''' echo "$(free -m | awk 'NR==2 {print $3}')" "$(date +'%H:%M:%S')" '''
@@ -18,7 +22,7 @@ while True:
         result = execute_command(cmd)
 
         parameter, time = result.split(' ')
-        parameter_name = "CPU"
+        parameter_name = "RAM"
             
 
-        print(f"{{Headers:{{{69},{PLUGIN_ID},Opis_DATA{{{parameter_name}: {type}}},LIST[{{{time},{parameter}}}]}}}}")
+        print(f"{{Headers:{{{69},{PLUGIN_ID},Opis_DATA{{{parameter_name}: {type}}},LIST[{{{time},{parameter}}}]}}}}", end="")

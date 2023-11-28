@@ -9,7 +9,7 @@
 
 #define SERVER_PORT 12345
 #define BUFFER_SIZE 256
-#define PULL_TIME 10
+#define PULL_TIME 2
 #define FILENAME "pomiary.txt"
 
 void send_info(int client_socket) {
@@ -56,7 +56,7 @@ void* handle_client(void* arg) {
             // Timeout occurred, no data received within 60 seconds
             send_info(client_socket);
             if (z == 0) {
-                printf("No data received within 60 seconds. Continuing...\n");
+                printf("No data received within %d seconds. Continuing...\n", PULL_TIME);
             }
             z = 0;
             continue;

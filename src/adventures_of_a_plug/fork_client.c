@@ -56,32 +56,33 @@ int popen2(const char *cmdline, struct popen2 *childinfo) {
     return 0; 
 }
 
-char* get_data_plugin(int guid, int node, struct popen2 * plugin) {
+char* get_data_plugin(int guid, int node, struct popen2 plugin) {
+    printf("get_data wywolane\n");
     
     // I make the child read 
-    write(plugin->to_child, "GET_DATA", 8);
+    write(plugin.to_child, "GET_DATA\n", 10);
 
     size_t result_size = 0;
     char* result = NULL;
-    char buffer[1024];
+
+    printf("po write\n");
 
 
     result = (char*)malloc(sizeof(char) * 1025);
 
-    printf("CHUJ\n");
-
     // I read what my child has written 
-    int x = read(plugin->from_child, result, 1024);
+    result_size = read(plugin.from_child, result, 1024);
 
-    printf("DUPA\n");
-    
+    printf("po read\n");
+
+    sleep(1);
+
     printf("%s\n", result);
-
-    result[x] = '\0';
 
     if (result_size > 0) {
         return result;
-    } else {
+    } 
+    else {
         free(result);
         return NULL;
     }
@@ -135,6 +136,7 @@ int main(int argc, char* argv[]){
     char buffer[BUFFER_SIZE];
 
     while (1) {
+        printf("test\n");
         memset(buffer, 0, sizeof(buffer));
 
         // Receive data from the server
@@ -145,22 +147,22 @@ int main(int argc, char* argv[]){
 
         // Check if the received command is "GATHER_INFO"
         if (strcmp(buffer, "GATHER_INFO") == 0) {
+          printf("GATHER_INFO\n");
             if(CONST_DATA) {
+              printf("CONST_DATA");
               // Send data to the server
               send_data(client_socket, "Client data to send");
               memset(buffer, 0, sizeof(buffer)); // Clear the buffer
             } 
             else {
-              printf("dupa\n");
+              printf("for loop\n");
               for (int i = 0; i < plugin_list_length; i++) {
-                printf("DUPA\n");
                 char * data;
-                data = get_data_plugin(guid,id_node, &children[i]);
+                data = get_data_plugin(guid,id_node, children[i]);
 
-                printf("%s\n", data);
-  
                 send_data(client_socket, data);
                 free(data);
+                sleep(1);
               }
             }
         }
