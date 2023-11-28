@@ -11,138 +11,53 @@
 const int ram_guid = 0;
 const int cpu_guid = 1;
 
-char* format(int parametr, char* parametrName, int id_węzła, int id_pluginu, int time) {
-    int dlugosc_wyniku = snprintf(NULL, 0, "{Headers:{%d,%d,Opis_DATA{%s: int},LIST[{%d,%d}]}}}", id_węzła, id_pluginu, parametrName, time, parametr);
+char* get_data_plugin(int guid, int node) {
+    char command[100];
+    snprintf(command, sizeof(command), "python3 plugin.py %d %d > plugin.tmp", guid, node);
 
-    char* wynik = malloc((dlugosc_wyniku + 1) * sizeof(char));  // +1 na znak końca ciągu '\0'
+    // Wywołanie skryptu Pythona i zapisanie wyniku do pliku
+    system(command);
 
-    if (wynik == NULL) {
-        perror("Błąd alokacji pamięci");
-        exit(EXIT_FAILURE);
+    FILE* file = fopen("plugin.tmp", "r");
+    if (!file) {
+        perror("Error opening file");
+        return NULL;
     }
 
-    snprintf(wynik, dlugosc_wyniku + 1, "{Headers:{%d,%d,Opis_DATA{%s: int},LIST[{%d,%d}]}}}", id_węzła, id_pluginu, parametrName, time, parametr);
+    size_t result_size = 0;
+    char* result = NULL;
+    char buffer[1024];
 
-    return wynik;
-}
+    while (fgets(buffer, sizeof(buffer), file) != NULL) {
 
-char* format_with_guid(int parametr, char* parametrName, int id_węzła, int id_pluginu, int time, int guid) {
-    int dlugosc_wyniku = snprintf(NULL, 0, "{Headers:{node_id: %d,\nplugin_id: %d,\nguid: %d,\ndata: [{time: %d,\n%s: %d}]}}}", id_węzła, id_pluginu, guid, time, parametrName, parametr);
+        buffer[strcspn(buffer, "\n")] = '\0';
 
-    char* wynik = malloc((dlugosc_wyniku + 1) * sizeof(char));  // +1 na znak końca ciągu '\0'
-
-    if (wynik == NULL) {
-        perror("Błąd alokacji pamięci");
-        exit(EXIT_FAILURE);
-    }
-
-    snprintf(wynik, dlugosc_wyniku + 1, "{Headers:{node_id: %d,\nplugin_id: %d,\nguid: %d,\ndata: [{time: %d,\n%s: %d}]}}}", id_węzła, id_pluginu, guid, time, parametrName, parametr);
-
-    return wynik;
-}
-
-
-char* get_data(int id_node) {
-    char buffer[256];
-    system("./memoryUsage.sh > memory_usage.tmp");
-    FILE *file = fopen("memory_usage.tmp", "r"); 
-    if (fgets(buffer, sizeof(buffer), file) != NULL) {
-        // Konwersja odczytanej wartości na liczbę
-        int memory_usage = atoi(buffer);
-
-        // Odczytanie czasu wykonania z potoku
-        if (fgets(buffer, sizeof(buffer), file) != NULL) {
-            int execution_time = atoi(buffer);
-
-            // Wywołanie funkcji format
-            char* wynik = format(memory_usage, "Ram", id_node, 1, execution_time);
+       
+        result = (char*)realloc(result, result_size + strlen(buffer) + 1);
+        if (!result) {
+            perror("Memory allocation error");
             fclose(file);
-            system("rm memory_usage.tmp");
-            return wynik;
-
-           
-
-        
-        } else {
-            printf("Błąd odczytu czasu wykonania z potoku\n");
+            return NULL;
         }
-    } else {
-        printf("Błąd odczytu z potoku\n");
+
+        strcpy(result + result_size, buffer);
+        result_size += strlen(buffer);
     }
 
-    char *error_msg = "error";
-    return error_msg;
-}
+    fclose(file);
+    system("rm plugin.tmp");
 
-char* get_data_ram(int id_node) {
-    char buffer[256];
-    system("./memoryUsage.sh > memory_usage.tmp");
-    FILE *file = fopen("memory_usage.tmp", "r"); 
-    if (fgets(buffer, sizeof(buffer), file) != NULL) {
-        // Konwersja odczytanej wartości na liczbę
-        int memory_usage = atoi(buffer);
-
-        // Odczytanie czasu wykonania z potoku
-        if (fgets(buffer, sizeof(buffer), file) != NULL) {
-            int execution_time = atoi(buffer);
-
-            // Wywołanie funkcji format
-            char* wynik = format_with_guid(memory_usage, "Ram", id_node, 1, execution_time, ram_guid);
-            fclose(file);
-            system("rm memory_usage.tmp");
-            return wynik;
-
-           
-
-        
-        } else {
-            printf("Błąd odczytu czasu wykonania z potoku\n");
-        }
+    if (result_size > 0) {
+        return result;
     } else {
-        printf("Błąd odczytu z potoku\n");
+        free(result);
+        return NULL;
     }
-
-    char *error_msg = "error";
-    return error_msg;
 }
 
-char* get_data_cpu(int id_node) {
-    char buffer[256];
-    system("./cpu.sh > cpu.tmp");
-    FILE *file = fopen("cpu.tmp", "r"); 
-    if (fgets(buffer, sizeof(buffer), file) != NULL) {
-        // Konwersja odczytanej wartości na liczbę
-        int memory_usage = atoi(buffer);
+void send_data(int server_socket, char *data) {
+	printf("Data to be sent: %s\n", data);
 
-        // Odczytanie czasu wykonania z potoku
-        if (fgets(buffer, sizeof(buffer), file) != NULL) {
-            int cpu_usage = atoi(buffer);
-
-            // Wywołanie funkcji format
-            char* wynik = format_with_guid(memory_usage, "CPU", id_node, 1, cpu_usage, cpu_guid);
-            fclose(file);
-            system("rm cpu.tmp");
-            return wynik;
-
-           
-
-        
-        } else {
-            printf("Błąd odczytu czasu wykonania z potoku\n");
-        }
-    } else {
-        printf("Błąd odczytu z potoku\n");
-    }
-
-    char *error_msg = "error";
-    return error_msg;
-}
-
-void send_formated_data(int server_socket, char *fdata) {
-  send(server_socket, fdata, strlen(fdata), 0);
-}
-void send_data(int server_socket) {
-    char data[] = "Client data to send";
     send(server_socket, data, strlen(data), 0);
 }
 
@@ -188,15 +103,12 @@ int main(int argc, char* argv[]){
         if (strcmp(buffer, "GATHER_INFO") == 0) {
             if(CONST_DATA) {
               // Send data to the server
-              send_data(client_socket);
+              send_data(client_socket, "Client data to send");
               memset(buffer, 0, sizeof(buffer)); // Clear the buffer
             } else {
               char *data;
-              if(guid == ram_guid)
-                data = get_data_ram(id_node);
-              else 
-                  data = get_data_cpu(id_node);
-              send_formated_data(client_socket, data);
+                  data = get_data_plugin(guid,id_node);
+              send_data(client_socket, data);
               free(data);
             }
         }

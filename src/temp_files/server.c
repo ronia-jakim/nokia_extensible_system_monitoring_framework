@@ -1,4 +1,4 @@
-#include <stdio.h>
+﻿#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -10,7 +10,6 @@
 #define SERVER_PORT 12345
 #define BUFFER_SIZE 256
 #define PULL_TIME 10
-#define FILENAME "pomiary.txt"
 
 void send_info(int client_socket) {
     char message[] = "GATHER_INFO";
@@ -21,19 +20,14 @@ void* handle_client(void* arg) {
     int client_socket = *((int*)arg);
     free(arg); // Free the memory allocated for the client socket
 
-    printf("Client connected. Socket: %d\n", client_socket);
+printf("Client connected. Socket: %d\n", client_socket);
+
 
     char buffer[BUFFER_SIZE];
-    bool z = 0;
-
-    send_info(client_socket);
-
-    FILE* file = fopen(FILENAME, "a");
-    if (!file) {
-        perror("Error opening file");
-        close(client_socket);
-        return NULL;
-    }
+	bool z=0;
+	
+   
+	send_info(client_socket);
 
     while (1) {
         memset(buffer, 0, sizeof(buffer));
@@ -46,7 +40,7 @@ void* handle_client(void* arg) {
         struct timeval timeout;
         timeout.tv_sec = PULL_TIME;
         timeout.tv_usec = 0;
-
+	  
         int result = select(client_socket + 1, &read_fds, NULL, NULL, &timeout);
 
         if (result == -1) {
@@ -54,11 +48,10 @@ void* handle_client(void* arg) {
             break;
         } else if (result == 0) {
             // Timeout occurred, no data received within 60 seconds
-            send_info(client_socket);
-            if (z == 0) {
-                printf("No data received within 60 seconds. Continuing...\n");
-            }
-            z = 0;
+		send_info(client_socket);
+		if (z==0){
+            printf("No data received within 60 seconds. Continuing...\n");}
+		z=0;
             continue;
         } else {
             // Data is available, receive it
@@ -66,21 +59,15 @@ void* handle_client(void* arg) {
                 perror("Error receiving data from client");
                 break;
             }
+		//send_info(client_socket);
             // Process the received data from the client as needed
             printf("Received data from client: %s\n", buffer);
-
-            // Save data to file
-            fprintf(file, "%s\n", buffer);
-
-            fflush(file);
-
-            z = 1;
+		z=1;
         }
     }
 
-    fclose(file);
     close(client_socket);
-    printf("Client disconnected. Socket: %d\n", client_socket);
+printf("Client disconnected. Socket: %d\n", client_socket);
 
     return NULL;
 }
