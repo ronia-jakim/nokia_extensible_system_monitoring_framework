@@ -1,0 +1,1 @@
+./parametry.sh {node} {plugin_id}
