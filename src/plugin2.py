@@ -8,13 +8,20 @@ def execute_command(command):
     return result.stdout.strip()
 
 def process_file(guid, node):
-    file_path = "parametry.txt" 
+    file_path = "parametry2.txt" 
     with open(file_path, "r", encoding='utf-8-sig') as file:
-        command_template = file.read().strip()
-    command = command_template.replace('{node}', str(node))
-    command = command.replace('{plugin_id}', str(PLUGIN_ID))
-    result = execute_command(command)
-    print(result)
+         lines = file.readlines()
+    for line in lines:
+        parts = line.split("'",2)
+        file_num = int(parts[0])
+        if file_num == guid:
+            command = parts[1].strip()
+            command = command.replace('{node}', str(node))
+            command = command.replace('{plugin_id}', str(PLUGIN_ID))
+            result = execute_command(command)
+            print(result)
+            break
+   
 
 def main():
     guid = int(sys.argv[1])
@@ -23,4 +30,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
