@@ -1,1 +1,1 @@
-./parametry.sh {node} {plugin_id}
+0'./parametry.sh {node} {plugin_id}
