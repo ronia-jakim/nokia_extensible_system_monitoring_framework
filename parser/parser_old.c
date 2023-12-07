@@ -564,23 +564,23 @@ void print_node(Node* node) {
 
 
 
-void validate_data_desc(Node* node) {
+void validate(Node* node) {
     switch(node->tag) {
         case INT_NODE:
             erornij("numerały nie moga się pojawiać w definicji formatu danych");
         case STRING_VALUE_NODE:
-            erornij("Wartości stringów nie moga się pojawiac w formacie danych");
+            erornij("Wartości stringów nei moga się pojawiac w formacie danych");
         case BOOL_NODE:
-            erornij("Wartości Boolów nie moga się pojawiac w formacie danych");
+            erornij("Wartości Boolów nei moga się pojawiac w formacie danych");
         case NULL_NODE:
-            erornij("Wartości null nie moga się pojawiac w formacie danych");
+            erornij("Wartości null nei moga się pojawiac w formacie danych");
         case OBJECT_NODE:
-            object_node_iter(&validate_data_desc, node->data.object);
+            object_node_iter(&validate, node->data.object);
             break;
         case LIST_NODE:
             if(node->data.list->list_length != 1)
                 erornij("W formacie danych typ listy oznacamy jak listę 1 elementową: \"[INT\"");
-            list_node_iter(&validate_data_desc, node->data.list);
+            list_node_iter(&validate, node->data.list);
             break;
         default:
             break;
@@ -607,249 +607,33 @@ bool check_unique( DataDesc* ddesc, int length) {
     return true;
 }
 
-DataDesc* gen_table(Node* config, int* length) {
+bool gen_table(Node* config,  DataDesc* ddesc, int* length) {
     if(config->tag != OBJECT_NODE) erornij("W configu na toplevelu musi znajdować się obiekt");
-    validate_data_desc(config);
+    validate(config);
     *length = config->data.object->number_of_fields;
-    DataDesc* ddesc = malloc(sizeof(DataDesc) * (*length + 4) );
+    ddesc = malloc(sizeof(DataDesc) * *length );
     for(int i = 0; i < *length; i++) {
         ddesc[i].name = config->data.object->fields_names[i];
         ddesc[i].desc = config->data.object->fields_values[i];
     }
-    if(!check_unique(ddesc, *length))return NULL;
-    return ddesc;
+    return check_unique(ddesc, *length);
 }
 
-
-
-
-bool validate_data_with_desc(Node* data, Node* desc) {
-  if(desc->tag == PRIMITIVE_TYPE_NODE) {
-    if(desc->data.primitive_type == IntType) {
-      return (data->tag == INT_NODE);
-    }
-    if(desc->data.primitive_type == StringType) {
-      return (data->tag == STRING_VALUE_NODE);
-    }
-    return false;
-  }
-  if(desc->tag == OBJECT_NODE) {
-    if(data->tag != OBJECT_NODE) {
-      fprintf(stderr, "oczekiwano obiektu\n");
-      return false;
-    }
-    if(data->data.object->number_of_fields != desc->data.object->number_of_fields) return false;
-    for(int i = 0; i < data->data.object->number_of_fields; i++) {
-      if(strcmp(data->data.object->fields_names[i], desc->data.object->fields_names[i])) {
-        fprintf(stderr, "nie ma pola o nazwie %s\n", desc->data.object->fields_names[i]);
-        fprintf(stderr, "pole ma nazwe %s\n", data->data.object->fields_names[i]);
-        return false;
-      }
-      if(!validate_data_with_desc(data->data.object->fields_values[i], desc->data.object->fields_values[i])) {
-        fprintf(stderr, "pole %s nie zgadza sie z data_desc\n", desc->data.object->fields_names[i]);
-        return false;
-      }
-    }
-    return true;
-  }
-  if(desc->tag == LIST_NODE) {
-    if(data->tag != LIST_NODE) return false;
-    for(int i = 0; i < data->data.list->list_length; i++) {
-      if(!validate_data_with_desc(data->data.list->elements[i], desc->data.list->elements[0])) {
-        fprintf(stderr, "%i element list ma zly typ\n", i);
-        return false;
-      }
-    }
-    return true;
-
-  }
-
-
-
-  return true;
-}
-
-
-bool validate_sended_data(Node* sended_data, DataDesc* data_desc_table, int data_desc_table_length) {
-
-  // check fif toplevel node is object
-  if(sended_data->tag != OBJECT_NODE) {
-    fprintf(stderr, "%s", "toplevel node should be object in sended_data");
-    return false;
-  }
-  // get headers from toplevel node 
-  Node* headers = NULL;
-  for(int i = 0; i < sended_data->data.object->number_of_fields; i++) {
-    if(!strcmp(sended_data->data.object->fields_names[i], "\"headers\"")) {
-      headers = sended_data->data.object->fields_values[i];
-      break;
-    }
-  }
-  if(headers == NULL) return false;
-  if(headers->tag != OBJECT_NODE) {
-    fprintf(stderr, "%s", "headers should be object");
-    return false;
-  }
-
-// get node_id from headers
-  Node* node_id_node = NULL;
-  for(int i = 0; i < headers->data.object->number_of_fields; i++) {
-    if(!strcmp(headers->data.object->fields_names[i], "\"node_id\"")) {
-      node_id_node = headers->data.object->fields_values[i];
-      break;
-    }
-  }
-  if(node_id_node == NULL) return false;
-  if(node_id_node->tag != INT_NODE) return false;
-  int node_id = node_id_node->data.number;
-
-// get node_id from headers
-  Node* plugin_id_node = NULL;
-  for(int i = 0; i < headers->data.object->number_of_fields; i++) {
-    if(!strcmp(headers->data.object->fields_names[i], "\"plugin_id\"")) {
-      plugin_id_node = headers->data.object->fields_values[i];
-      break;
-    }
-  }
-  if(plugin_id_node == NULL) return false;
-  if(plugin_id_node->tag != INT_NODE) return false;
-  int plugin_id = plugin_id_node->data.number;
-
- // get data_type from headers
-
-  Node* data_type = NULL;
-  for(int i = 0; i < headers->data.object->number_of_fields; i++) {
-    if(!strcmp(headers->data.object->fields_names[i], "\"data_type\"")) {
-      data_type = headers->data.object->fields_values[i];
-      break;
-    }
-  }
-  if(data_type == NULL) return false;
-  if(data_type->tag != STRING_VALUE_NODE) return false;
-  char* string_of_data_type = data_type->data.string;
-
-
-
-  //get data_description for sended_data
-  Node* data_desc = NULL;
-  for(int i = 0; i < data_desc_table_length; i++) {
-    if(!strcmp(string_of_data_type, data_desc_table[i].name)) {
-      data_desc = data_desc_table[i].desc;
-      break;
-    }
-  }
-  if(data_desc == NULL) {
-
-    fprintf(stderr, "%s", "nie znaleziono data description o tym name\n");
-    return false;
-  }
-
-
-  //get data_lit from toplevle node
-  Node* data_list = NULL;
-  for(int i = 0; i < sended_data->data.object->number_of_fields; i++) {
-    if(!strcmp(sended_data->data.object->fields_names[i], "\"data_list\"")) {
-      data_list = sended_data->data.object->fields_values[i];
-      break;
-    }
-  }
-
-  if(data_desc == NULL) return false;
-  if(data_list == NULL) return false;
-  if(data_list->tag != LIST_NODE) {
-    return false;
-  }
-
-
-  // validate each data_entry 
-  for(int i = 0; i < data_list->data.list->list_length; i++) {
-    Node* data_entry = data_list->data.list->elements[i];
-    if(data_entry->tag != OBJECT_NODE) return false;
-
-    //get nodes from data_entry
-    Node* time_node = NULL;
-    Node* data_node = NULL;
-    for(int j = 0; j < data_entry->data.object->number_of_fields; j++) {
-      if(!strcmp("\"time\"", data_entry->data.object->fields_names[j])) {
-       time_node = data_entry->data.object->fields_values[j]; 
-      }
-      if(!strcmp("\"data\"", data_entry->data.object->fields_names[j])) {
-       data_node = data_entry->data.object->fields_values[j]; 
-      }
-    }
-
-    // get time
-    if(time_node == NULL) {
-      fprintf(stderr, "w %i-tej data_entry nie ma pola time", i);
-      return false;
-    }
-    if(time_node->tag != INT_NODE) {
-      fprintf(stderr, "w %i-tej data_entry pole time nie zawiera inta", i);
-      return false;
-    }
-    int time = time_node->data.number;
-
-
-    // get data 
-    if(data_node == NULL) return false;
-    if(!validate_data_with_desc(data_node, data_desc)) {
-      fprintf(stderr, "w %i-tej data_entry pole data jest niezgodne z opisem danych", i);
-      return false;
-    }
-  }
-
-
-  return true;
-}
-
-/*
-  { "headers": {
-      "node_id": 3,
-      "plugin_id": 2,
-      "data_type": "a",
-    },
-    "data_list": [
-      {
-        "time": 1,
-        "data": //data described by data type
-      }
-    ]
-  }
- 
- */
-
-
-bool parse_sended_data(char* sended_data, DataDesc* data_desc_table, int data_desc_table_length) {
-  Lexer l = new_lexer(sended_data);
-  Parser p = parser_new(&l);
-  Node* n = parse_value(&p);
-  return validate_sended_data(n, data_desc_table, data_desc_table_length);
-
-}
 
 void test_parser() {
 
-    char input_string_desc[] = "{ \"a\" : [ { \"first\": INT, \"second\": STRING } ], \"b\" : STRING , \"c\": { \"a\": [ STRING] }}";
-    Lexer l = new_lexer(input_string_desc);
+    char input_string[] = "{ \"a\" : [ { \"first\": INT, \"second\": SECOND } ], \"b\" : STRING , \"c\": { \"a\": [ STRING] }}";
+    Lexer l = new_lexer(input_string);
+  //  print_all_tokens(&l);
+  //  return 0;
     Parser p = parser_new(&l);
+
     Node* n = parse_value(&p);
+    print_node(n);
+    DataDesc* data_desc_table;
     int* length = malloc(sizeof(int));
-    DataDesc* data_desc_table = gen_table(n, length);
+    gen_table(n, data_desc_table, length);
 
 
 
-    char* sended_data_b = "{ \"headers\": { \"node_id\": 7, \"plugin_id\":2, \"data_type\": \"b\" }, \"data_list\": [ { \"time\": 4, \"data\": \"abc\" }, { \"time\": 1, \"data\": \"abdc\" } ] }";
-    if(parse_sended_data(sended_data_b, data_desc_table, *length)) {
-      printf("checked\n");
-    } else {
-      printf("wrong\n");
-    }
-
-
-    char* sended_data_a = "{ \"headers\": { \"node_id\": 7, \"plugin_id\":2, \"data_type\": \"a\" }, \"data_list\": [ { \"time\": 4, \"data\": [       { \"first\" : 9, \"second\": \"ssd\"},     { \"first\" : 3, \"second\": \"ss\"}, ] } ] }    ";
-    if(parse_sended_data(sended_data_a, data_desc_table, *length)) {
-      printf("checked\n");
-    } else {
-      printf("wrong\n");
-    }
 }
