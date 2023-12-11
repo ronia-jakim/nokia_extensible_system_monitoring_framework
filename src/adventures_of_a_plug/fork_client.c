@@ -8,6 +8,8 @@
 #define SERVER_PORT 12345
 #define BUFFER_SIZE 256
 #define CONST_DATA 0
+
+#define MAX_PLUGIN 2
 const int ram_guid = 0;
 const int cpu_guid = 1;
 
@@ -56,28 +58,20 @@ int popen2(const char *cmdline, struct popen2 *childinfo) {
     return 0; 
 }
 
-char* get_data_plugin(int guid, int node, struct popen2 plugin) {
-    printf("get_data wywolane\n");
-    
-    // I make the child read 
-    write(plugin.to_child, "GET_DATA\n", 10);
-
+char* get_data_plugin(int guid, int node, struct popen2 *plugin) {
     size_t result_size = 0;
     char* result = NULL;
 
-    printf("po write\n");
-
-
     result = (char*)malloc(sizeof(char) * 1025);
 
-    // I read what my child has written 
-    result_size = read(plugin.from_child, result, 1024);
 
-    printf("po read\n");
+    // I make the child read 
+    write(plugin->to_child, "GET_DATA\n", 10);
+
+    // I read what my child has written 
+    result_size = read(plugin->from_child, result, 1024);
 
     sleep(1);
-
-    printf("%s\n", result);
 
     if (result_size > 0) {
         return result;
@@ -94,6 +88,13 @@ void send_data(int server_socket, char *data) {
     send(server_socket, data, strlen(data), 0);
 }
 
+int read_config (char * plug_lst) {
+  int lst_length = 0;
+  
+
+  return lst_length;
+}
+
 int main(int argc, char* argv[]){
     int id_node = 0;
     int guid = ram_guid;
@@ -104,13 +105,13 @@ int main(int argc, char* argv[]){
         guid = atoi(argv[2]);
     }
 
-    char * plugin_list [] = {
-      "./ram_usage.py",
-      "./cpu_usage.py"
+    char * plugin_list[MAX_PLUGIN] = {
+      "./ram.sh",
+      "./cpu.sh"
     };
 
-    int plugin_list_length = 2;
-
+    int plugin_list_length = MAX_PLUGIN;
+    
     struct popen2 children[5];
 
     for (int i = 0; i < plugin_list_length; i++) {
@@ -147,18 +148,18 @@ int main(int argc, char* argv[]){
 
         // Check if the received command is "GATHER_INFO"
         if (strcmp(buffer, "GATHER_INFO") == 0) {
-          printf("GATHER_INFO\n");
+
             if(CONST_DATA) {
-              printf("CONST_DATA");
               // Send data to the server
               send_data(client_socket, "Client data to send");
               memset(buffer, 0, sizeof(buffer)); // Clear the buffer
             } 
             else {
-              printf("for loop\n");
+
+              // go through every child process and get data from them
               for (int i = 0; i < plugin_list_length; i++) {
                 char * data;
-                data = get_data_plugin(guid,id_node, children[i]);
+                data = get_data_plugin(guid,id_node, &children[i]);
 
                 send_data(client_socket, data);
                 free(data);
