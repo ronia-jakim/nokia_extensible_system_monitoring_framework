@@ -11,7 +11,7 @@ Projekt zespołowy z udziałem
 
 ## TODO list
 - [x] zamiana pthread_* na std::thread
-- [ ] problem recv/send (buforowanie nieprzeżartych bajtów)
+- [x] problem recv/send (buforowanie nieprzeżartych bajtów)
 - [ ] przesyłanie wszystkich znanych wskaźników jednocześnie
 - [ ] rozszerzenie opisu danych o monitorowanie zasobów dynamicznych (takich jak procesy)
 - [ ] integracja parsera (metadanych i danych)
