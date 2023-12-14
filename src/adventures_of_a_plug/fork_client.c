@@ -254,7 +254,8 @@ char* get_data_plugin(int guid, int node, struct popen2 *plugin) {
     // I make the child read 
     write(plugin->to_child, "GET_DATA\n", 10);
 
-    // I read what my child has written 
+    // I read what my child has written
+    // pilnować, czy dostaliśmy już wszystko
     result_size = read(plugin->from_child, result, 1024);
 
     sleep(1);
