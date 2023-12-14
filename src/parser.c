@@ -435,6 +435,14 @@ Node* parse_value(Parser *p) {
 
     const int token_type = p->cur_token->token_type;
     if(token_type == TOKEN_EOF) {
+
+
+
+        /*    Node* ptr = malloc(sizeof(Node));
+            ptr->data.number = 42;
+            ptr->tag = INT_NODE;
+
+            return ptr; */
         fprintf( stderr, "PARSING_ERROR: END OF TOKENS!" );
         exit(1);
     };

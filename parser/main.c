@@ -4,7 +4,6 @@
 #include "parser.h"
 
 int main() {
-    //test();
-    test_parser();
+    test_annotate_parser();   //test();
     return 0;
 }

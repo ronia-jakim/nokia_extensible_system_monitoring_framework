@@ -1,0 +1,2 @@
+{ "a" : [ { "first": INT, "second" : STRING } ], "b" : STRING, "c" : { "a" : [
+STRING ] } }

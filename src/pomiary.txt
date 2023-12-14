@@ -281,3 +281,9 @@
 17
 1702470147.823368678
 
+{ "headers": { "node_id": 7, "plugin_id":2, "data_type": "b" }, "data_list": [ { "time": 4, "data": "abc" }, { "time": 1, "data": "abdc" } ] }
+{"headers": {"node_id": 7, "plugin_id": 2, "data_type": "b", data_desc: STRING_TYPE, }, "data_list": [{"time": 4, "data": "abc", }, {"time": 1, "data": "abdc", }, ], }
+{"headers": {"node_id": 7, "plugin_id": 2, "data_type": "b", data_desc: STRING_TYPE, }, "data_list": [{"time": 4, "data": "abc", }, {"time": 1, "data": "abdc", }, ], }
+{"headers": {"node_id": 7, "plugin_id": 2, "data_type": "b", data_desc: STRING_TYPE, }, "data_list": [{"time": 4, "data": "abc", }, {"time": 1, "data": "abdc", }, ], }
+{"headers": {"node_id": 7, "plugin_id": 2, "data_type": "b", data_desc: STRING_TYPE, }, "data_list": [{"time": 4, "data": "abc", }, {"time": 1, "data": "abdc", }, ], }
+{"headers": {"node_id": 7, "plugin_id": 2, "data_type": "b", data_desc: STRING_TYPE, }, "data_list": [{"time": 4, "data": "abc", }, {"time": 1, "data": "abdc", }, ], }

@@ -7,7 +7,7 @@
 
 #define SERVER_PORT 12345
 #define BUFFER_SIZE 256
-#define CONST_DATA 0
+#define CONST_DATA 1
 const int ram_guid = 0;
 const int cpu_guid = 1;
 
@@ -103,7 +103,8 @@ int main(int argc, char* argv[]){
         if (strcmp(buffer, "GATHER_INFO") == 0) {
             if(CONST_DATA) {
               // Send data to the server
-              send_data(client_socket, "Client data to send");
+    char* data_to_send = "{ \"headers\": { \"node_id\": 7, \"plugin_id\":2, \"data_type\": \"b\" }, \"data_list\": [ { \"time\": 4, \"data\": \"abc\" }, { \"time\": 1, \"data\": \"abdc\" } ] }";
+              send_data(client_socket, data_to_send);
               memset(buffer, 0, sizeof(buffer)); // Clear the buffer
             } else {
               char *data;
