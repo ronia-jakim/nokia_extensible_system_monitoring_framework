@@ -9,27 +9,6 @@ Projekt zespołowy z udziałem
 - Łukasz Magnuszewski
 - Katarzyna Stasińska
 
-## TODO list
-- [x] zamiana pthread_* na std::thread
-- [x] problem recv/send (buforowanie nieprzeżartych bajtów)
-- [ ] przesyłanie wszystkich znanych wskaźników jednocześnie
-- [ ] rozszerzenie opisu danych o monitorowanie zasobów dynamicznych (takich jak procesy)
-- [ ] integracja parsera (metadanych i danych)
-- [ ] pluginy po stronie agenta
-- [x] ustalenie terminologii na moduł centralny i moduły brzegowe
-- [x] zapisywanie danych przychodzących np. do pliku 
-- [x] przesyłanie z tagami (GUIDami)
-- [x] dwa różne typy danych
-- [x] parser
-- [x] monitorowanie jednego dowolnie wybranego  realnego parametru w systemie (odczytywanie przez kolektor i wysyłanie do centrali)
-- [x] pierwsza wersja centrali wielozadaniowej (obsługującej wiele kolektorów jednocześnie)
-- [x] pierwsza wersja formatu danych - na początku jako dwie biblioteki dla węzła i dla głównego serwera
-- [x] zalążek systemu budowania
-- [x] ~~PoC #include<sys/resource.h>~~
-- [x] push czy pull - zostaje push?
-- [x] pierwsza wersja serwera i klienta (sukces w komunikacji)
-
-
 ## Building 
 
 
