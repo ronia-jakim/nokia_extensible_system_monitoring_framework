@@ -43,7 +43,7 @@ void write_thread_function() {
         }
     }
 
-    fclose(file);  // Close the file when done
+    fclose(file); 
 }
 
 void manage(char *buffer, int client_socket) {
