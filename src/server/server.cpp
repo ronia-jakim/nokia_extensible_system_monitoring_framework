@@ -1,4 +1,4 @@
-﻿#include <iostream>
+#include <iostream>
 #include <cstring>
 #include <string>
 #include <stdio.h>
@@ -12,6 +12,7 @@
 #include <arpa/inet.h>
 #include <sys/select.h>
 #include <sys/socket.h>
+#include <mutex>
 
 #define SERVER_PORT 12345
 #define BUFFER_SIZE 256
@@ -19,9 +20,13 @@
 #define FILENAME "pomiary.txt"
 #define SEQUENCE "@" 
 
+std::mutex file_mutex;
 
-void manage(char *buffer, FILE *file) {
-    std::cout << "Received data from client: " << buffer << std::endl;
+
+void manage(char *buffer, FILE *file, int client_socket) {
+    std::cout << "Received data from client("<<client_socket<<"):" << buffer << std::endl;
+    std::lock_guard<std::mutex> lock(file_mutex); // automatically released when lock goes out of scope
+    fprintf(file, "%d :", client_socket);
     fprintf(file, "%s\n", buffer);
     fflush(file);
 }
@@ -82,13 +87,14 @@ void handle_client(int client_socket) {
                 perror("Error receiving data from client");
                 break;
             }
+            /*
             char *token;
             strcat(prebuffer, buffer);
             token = strtok(prebuffer, "@");
             char *prevToken = NULL;
             while (token != NULL) {
                 if(prevToken != NULL)
-                    manage(prevToken,file);
+                    manage(prevToken,file, client_socket);
                 prevToken = token;
                 token = strtok(NULL, "@");
                 if (token == NULL) {
@@ -96,7 +102,8 @@ void handle_client(int client_socket) {
                     strcat(prebuffer, prevToken);
                 }
             }
-
+            */
+            manage(buffer,file, client_socket);
             z = true;
         }
     }
