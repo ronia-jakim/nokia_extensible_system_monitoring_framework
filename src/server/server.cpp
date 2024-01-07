@@ -106,9 +106,29 @@ void handle_client(int client_socket) {
                 perror("Error receiving data from client");
                 break;
             }
-
+        
             manage(buffer, client_socket);
+            
             z = true;
+            
+            /*
+            
+                        char *token;
+            strcat(prebuffer, buffer);
+            token = strtok(prebuffer, "@");
+            char *prevToken = NULL;
+            while (token != NULL) {
+                if(prevToken != NULL)
+                    manage(prevToken,file);
+                prevToken = token;
+                token = strtok(NULL, "@");
+                if (token == NULL) {
+                    prebuffer[0]='\0';
+                    strcat(prebuffer, prevToken);
+                }
+            }
+            
+            */
         }
     }
 
