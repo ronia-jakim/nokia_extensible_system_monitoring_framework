@@ -12,23 +12,52 @@
 #include <arpa/inet.h>
 #include <sys/select.h>
 #include <sys/socket.h>
-#include <mutex>
+#include <mutex>  
+#include <queue>
 
 #define SERVER_PORT 12345
 #define BUFFER_SIZE 256
 #define PULL_TIME 10
 #define FILENAME "pomiary.txt"
-#define SEQUENCE "@" 
+#define SEQUENCE "@"
 
 std::mutex file_mutex;
+std::queue<std::pair<std::string, int>> write_queue; // A queue to hold data to be written
 
+void write_thread_function() {
+    FILE* file = fopen(FILENAME, "a");
+    if (!file) {
+        perror("Error opening file");
+        return;
+    }
 
-void manage(char *buffer, FILE *file, int client_socket) {
+    while (true) {
+        if (!write_queue.empty()) {
+            std::lock_guard<std::mutex> lock(file_mutex);
+            auto data = write_queue.front();
+            fprintf(file, "%d : %s\n", data.second, data.first.c_str());
+            fflush(file);
+            write_queue.pop();
+        } else {
+            std::this_thread::sleep_for(std::chrono::milliseconds(10)); // Sleep for a short time if the queue is empty
+        }
+    }
+
+    fclose(file);  // Close the file when done
+}
+
+void manage(char *buffer, int client_socket) {
+    /*
     std::cout << "Received data from client("<<client_socket<<"):" << buffer << std::endl;
-    std::lock_guard<std::mutex> lock(file_mutex); // automatically released when lock goes out of scope
-    fprintf(file, "%d :", client_socket);
-    fprintf(file, "%s\n", buffer);
-    fflush(file);
+        std::lock_guard<std::mutex> lock(file_mutex); // automatically released when lock goes out of scope
+        fprintf(file, "%d :", client_socket);
+        fprintf(file, "%s\n", buffer);
+        fflush(file);
+
+    */
+
+    std::cout << "Received data from client(" << client_socket << "): " << buffer << std::endl;
+    write_queue.push(std::make_pair(std::string(buffer), client_socket));
 }
 
 void send_info(int client_socket) {
@@ -40,18 +69,9 @@ void handle_client(int client_socket) {
     std::cout << "Client connected. Socket: " << client_socket << std::endl;
 
     char buffer[BUFFER_SIZE];
-    char prebuffer[BUFFER_SIZE];
-    prebuffer[0] = '\0';
     bool z = false;
 
     send_info(client_socket);
-
-    FILE* file = fopen(FILENAME, "a");
-    if (!file) {
-        perror("Error opening file");
-        close(client_socket);
-        return;
-    }
 
     while (true) {
         memset(buffer, 0, sizeof(buffer));
@@ -60,7 +80,6 @@ void handle_client(int client_socket) {
         FD_ZERO(&read_fds);
         FD_SET(client_socket, &read_fds);
 
-        
         auto start_time = std::chrono::steady_clock::now();
         std::chrono::seconds timeout(PULL_TIME);
 
@@ -87,29 +106,19 @@ void handle_client(int client_socket) {
                 perror("Error receiving data from client");
                 break;
             }
-            /*
-            char *token;
-            strcat(prebuffer, buffer);
-            token = strtok(prebuffer, "@");
-            char *prevToken = NULL;
-            while (token != NULL) {
-                if(prevToken != NULL)
-                    manage(prevToken,file, client_socket);
-                prevToken = token;
-                token = strtok(NULL, "@");
-                if (token == NULL) {
-                    prebuffer[0]='\0';
-                    strcat(prebuffer, prevToken);
-                }
-            }
-            */
-            manage(buffer,file, client_socket);
+
+            manage(buffer, client_socket);
             z = true;
         }
     }
+
+    close(client_socket);
 }
 
 int main() {
+    std::thread writer_thread(write_thread_function);
+    writer_thread.detach();  // Detach the writing thread
+
     int server_socket = socket(AF_INET, SOCK_STREAM, 0);
     if (server_socket == -1) {
         perror("Server socket error");
@@ -135,10 +144,11 @@ int main() {
         int client_socket = accept(server_socket, nullptr, nullptr);
         if (client_socket > 0) {
             std::thread client_thread(handle_client, client_socket);
-            client_thread.detach();  
+            client_thread.detach();
         }
     }
 
     close(server_socket);
     return 0;
 }
+
