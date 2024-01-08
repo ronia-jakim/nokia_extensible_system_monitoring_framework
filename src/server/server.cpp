@@ -46,18 +46,17 @@ void write_thread_function() {
     fclose(file); 
 }
 
-void manage(char *buffer, int client_socket) {
+void manage(char *buffer, FILE *file){//int client_socket) {
+    
+    std::cout << "Received data from client: " << buffer << std::endl;
+    std::lock_guard<std::mutex> lock(file_mutex); // automatically released when lock goes out of scope
+    fprintf(file, "%s\n", buffer);
+    fflush(file);
+
     /*
-    std::cout << "Received data from client("<<client_socket<<"):" << buffer << std::endl;
-        std::lock_guard<std::mutex> lock(file_mutex); // automatically released when lock goes out of scope
-        fprintf(file, "%d :", client_socket);
-        fprintf(file, "%s\n", buffer);
-        fflush(file);
-
-    */
-
     std::cout << "Received data from client(" << client_socket << "): " << buffer << std::endl;
     write_queue.push(std::make_pair(std::string(buffer), client_socket));
+    */
 }
 
 void send_info(int client_socket) {
@@ -69,9 +68,18 @@ void handle_client(int client_socket) {
     std::cout << "Client connected. Socket: " << client_socket << std::endl;
 
     char buffer[BUFFER_SIZE];
+    char prebuffer[BUFFER_SIZE];
+    prebuffer[0] = '\0';
     bool z = false;
 
     send_info(client_socket);
+
+    FILE* file = fopen(FILENAME, "a");
+    if (!file) {
+        perror("Error opening file");
+        close(client_socket);
+        return;
+    }
 
     while (true) {
         memset(buffer, 0, sizeof(buffer));
@@ -107,19 +115,27 @@ void handle_client(int client_socket) {
                 break;
             }
         
-            manage(buffer, client_socket);
+            //manage(buffer, client_socket);
             
-            z = true;
-            
-            /*
-            
-                        char *token;
+            char *token;
             strcat(prebuffer, buffer);
             token = strtok(prebuffer, "@");
             char *prevToken = NULL;
             while (token != NULL) {
-                if(prevToken != NULL)
-                    manage(prevToken,file);
+                if(prevToken != NULL){
+                    size_t number;
+                    if (sscanf(prevToken, "%zu", &number) == 1) {
+                        char *data_start = strchr(prevToken, '\n');
+                        if (data_start != NULL) {
+                            data_start++;  // Move to the actual data
+                            size_t data_length = strlen(data_start);
+
+                            if (data_length == number) {
+                                manage(data_start, file);
+                            } else {std::cerr << "Data length mismatch: " << prevToken << std::endl;}
+                        } else {std::cerr << "Invalid format: " << prevToken << std::endl;}
+                    } else {std::cerr << "Invalid format (no number): " << prevToken << std::endl;}
+                }
                 prevToken = token;
                 token = strtok(NULL, "@");
                 if (token == NULL) {
@@ -127,8 +143,7 @@ void handle_client(int client_socket) {
                     strcat(prebuffer, prevToken);
                 }
             }
-            
-            */
+           z = true;
         }
     }
 

@@ -56,10 +56,41 @@ char* get_data_plugin(int guid, int node) {
 }
 
 void send_data(int server_socket, char *data) {
-	printf("Data to be sent: %s\n", data);
+    size_t data_length = strlen(data);
+    size_t buffer_size = 1024;
+    char buffer[buffer_size];
 
-    send(server_socket, data, strlen(data), 0);
+    int formatted_length = snprintf(buffer, buffer_size, "%zu\n%s@", data_length, data);
+
+    if (formatted_length < 0 || (size_t)formatted_length >= buffer_size) {
+        fprintf(stderr, "Error formatting data.\n");
+        return;
+    }
+
+    size_t sent_total = 0;
+    ssize_t sent_bytes;
+
+    while (sent_total < (size_t)formatted_length) {
+        sent_bytes = send(server_socket, buffer + sent_total, formatted_length - sent_total, 0);
+
+        if (sent_bytes == -1) {
+            perror("send");
+            break;
+        } else if (sent_bytes == 0) {
+            fprintf(stderr, "Connection closed.\n");
+            break;
+        } else {
+            sent_total += sent_bytes;
+        }
+    }
+
+    if (sent_total == (size_t)formatted_length) {
+        printf("Data sent successfully.\n");
+    } else {
+        fprintf(stderr, "Failed to send all data.\n");
+    }
 }
+
 
 int main(int argc, char* argv[]){
     int id_node = 0;
