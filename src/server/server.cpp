@@ -46,11 +46,26 @@ void write_thread_function() {
     fclose(file); 
 }
 
-void manage(char *buffer, int client_socket) {
-    
+void manage(std::string buffer, int client_socket) {
     std::cout << "Received data from client(" << client_socket << "): " << buffer << std::endl;
-    write_queue.push(std::make_pair(std::string(buffer), client_socket));
+    write_queue.push(std::make_pair(buffer, client_socket));
 
+}
+
+std::vector<std::string> splitString(const std::string& input, char delimiter) {
+    std::vector<std::string> result;
+    size_t start = 0;
+    size_t end = input.find(delimiter);
+
+    while (end != std::string::npos) {
+        result.push_back(input.substr(start, end - start));
+        start = end + 1;
+        end = input.find(delimiter, start);
+    }
+
+    result.push_back(input.substr(start));
+
+    return result;
 }
 
 void send_info(int client_socket) {
@@ -62,8 +77,7 @@ void handle_client(int client_socket) {
     std::cout << "Client connected. Socket: " << client_socket << std::endl;
 
     char buffer[BUFFER_SIZE];
-    char prebuffer[BUFFER_SIZE];
-    prebuffer[0] = '\0';
+    std::string prebuffer = "";
     bool z = false;
 
     send_info(client_socket);
@@ -102,40 +116,22 @@ void handle_client(int client_socket) {
                 perror("Error receiving data from client");
                 break;
             }
-        
-            //manage(buffer, client_socket);
+            std::string Sbuffer = std::string(buffer);
+            std::vector<std::string> parts = splitString(Sbuffer,'@');
             int end = 0;
-            //if (buffer != nullptr && strlen(buffer) > 0 && buffer[strlen(buffer) - 1] == '@') {end = 1;}
-            int len = strlen(buffer);
-            if (len > 0 && buffer[len - 1] == '@') {end = 1;}
-            char *token;
-            strcat(prebuffer, buffer);
-            token = strtok(prebuffer, "@");
-            char *prevToken = NULL;
-            while (token != NULL || end == 1) {
-                if(end == 1){end = 0;}
-                std::cout << token;
-                if(prevToken != NULL){
-                    size_t number;
-                    if (sscanf(prevToken, "%zu", &number) == 1) {
-                        char *data_start = strchr(prevToken, '\n');
-                        if (data_start != NULL) {
-                            data_start++;  // Move to the actual data
-                            size_t data_length = strlen(data_start);
-
-                            if (data_length == number) {
-                                manage(data_start, client_socket);
-                            } else {std::cout << "Data length mismatch: " << prevToken << std::endl;}
-                        } else {std::cout << "Invalid format: " << prevToken << std::endl;}
-                    } else {std::cout << "Invalid format (no number): " << prevToken << std::endl;}
-                }
-                prevToken = token;
-                token = strtok(NULL, "@");
-                if (token == NULL) {
-                    prebuffer[0]='\0';
-                    strcat(prebuffer, prevToken);
-                }
+            if (Sbuffer[Sbuffer.size()-1]=='@'){
+                end=1;
             }
+            parts[0] = prebuffer + parts[0];
+
+            for(int i = 0; i < parts.size()-1; i++){
+                std::vector<std::string> check = splitString(parts[i],'\n');
+                int len1 = std::stoi(check[0]);
+                int len2 = check[1].size();
+                if(len1 == len2) {manage(check[1],client_socket);}
+            }
+            prebuffer = parts[parts.size()-1];
+            
             z = true;
         }
     }
