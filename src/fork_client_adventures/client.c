@@ -10,6 +10,8 @@
 #define BUFFER_SIZE 256
 #define CONST_DATA 0
 
+#define RESULT_SIZE 200
+
 #define MAX_PLUGIN 2
 #define CONFIG_FILE "./config.txt"
 const int ram_guid = 0;
@@ -246,17 +248,34 @@ int popen2(char * plugin_path, char * plugin_args, struct popen2 * childinfo) {
 
 char* get_data_plugin(int guid, int node, struct popen2 *plugin) {
     size_t result_size = 0;
-    char* result = NULL;
+    char* received = NULL;
 
-    result = (char*)malloc(sizeof(char) * 1025);
-
+    received = (char*)malloc(sizeof(char) * 1025);
+    
+    char* result = (char*)malloc(sizeof(char) * RESULT_SIZE);
 
     // I make the child read 
     write(plugin->to_child, "GET_DATA\n", 10);
 
     // I read what my child has written
-    // pilnować, czy dostaliśmy już wszystko
-    result_size = read(plugin->from_child, result, 1024);
+    result_size = read(plugin->from_child, received, 1024);
+    
+    // plugin should send information of form
+    // 5 bajts for size @ actual data @
+    
+    char size_info [5];
+    for (int i = 0; i < 5; i++) size_info[i] = received[i];
+
+    int expected_size = atoi(size_info);
+    int previous_result_size = 0;
+
+    while (result_size < expected_size) {
+      // saving received to result
+      for (int i = 0; i < result_size - previous_result_size; i++) result[previous_result_size+i] = received[i];
+      
+      previous_result_size = result_size;
+      result_size += read(plugin->from_child, received, 1024);
+    }
 
     sleep(1);
 
