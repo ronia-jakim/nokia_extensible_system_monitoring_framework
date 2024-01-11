@@ -18,33 +18,58 @@
 #define SERVER_PORT 12345
 #define BUFFER_SIZE 1024
 #define PULL_TIME 10
-#define FILENAME "pomiary.txt"
+//#define FILENAME "pomiary.txt"
 #define SEQUENCE "@"
 
 std::mutex file_mutex;
 std::queue<std::pair<std::string, int>> write_queue; // A queue to hold data to be written
 
+
+const std::string FILENAME = "output_";
+const int MAX_FILE_SIZE_MB = 10;
+const int MAX_TIME_DIFF_SECONDS = 60;
+
+
 void write_thread_function() {
-    FILE* file = fopen(FILENAME, "a");
-    if (!file) {
-        perror("Error opening file");
-        return;
-    }
+    std::ofstream file;
+    int current_file_number = 1;
+    std::chrono::steady_clock::time_point last_write_time = std::chrono::steady_clock::now();
 
     while (true) {
         if (!write_queue.empty()) {
             std::lock_guard<std::mutex> lock(file_mutex);
+
+            if (file.is_open() &&
+                (file.tellp() / 1024 / 1024 > MAX_FILE_SIZE_MB ||
+                 std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - last_write_time).count() > MAX_TIME_DIFF_SECONDS)) {
+                file.close();
+                current_file_number++;
+            }
+
+            if (!file.is_open()) {
+                std::string filename = FILENAME + std::to_string(current_file_number) + ".txt";
+                file.open(filename, std::ios_base::app);
+                if (!file.is_open()) {
+                    std::cerr << "Error opening file " << filename << std::endl;
+                    return;
+                }
+                last_write_time = std::chrono::steady_clock::now();
+            }
+
             auto data = write_queue.front();
-            fprintf(file, "%d : %s\n", data.second, data.first.c_str());
-            fflush(file);
+            file << data.second << " : " << data.first << std::endl;
             write_queue.pop();
         } else {
             std::this_thread::sleep_for(std::chrono::milliseconds(10)); // Sleep for a short time if the queue is empty
         }
     }
 
-    fclose(file); 
+    if (file.is_open()) {
+        file.close();
+    }
 }
+
+
 
 void manage(std::string buffer, int client_socket) {
     std::cout << "Received data from client(" << client_socket << "): " << buffer << std::endl;
