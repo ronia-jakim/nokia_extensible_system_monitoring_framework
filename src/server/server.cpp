@@ -22,7 +22,7 @@
 #define SEQUENCE "@"
 
 std::mutex file_mutex;
-std::queue<std::pair<std::string, int>> write_queue; // A queue to hold data to be written
+std::queue<std::pair<std::string, std::string>> write_queue; // A queue to hold data to be written
 
 
 const std::string FILENAME = "output_";
@@ -71,9 +71,10 @@ void write_thread_function() {
 
 
 
-void manage(std::string buffer, int client_socket) {
-    std::cout << "Received data from client(" << client_socket << "): " << buffer << std::endl;
-    write_queue.push(std::make_pair(buffer, client_socket));
+void manage(std::string buffer, int client_socket, std::string ip, int port) {
+    std::string info = ip +":::"+ std::to_string(port);
+    std::cout << "Received data from client(" << info << "): " << buffer << std::endl;
+    write_queue.push(std::make_pair(buffer, info));
 
 }
 
@@ -98,7 +99,7 @@ void send_info(int client_socket) {
     send(client_socket, message, strlen(message), 0);
 }
 
-void handle_client(int client_socket) {
+void handle_client(int client_socket, std::string ip, int port) {
     std::cout << "Client connected. Socket: " << client_socket << std::endl;
 
     char buffer[BUFFER_SIZE];
@@ -153,7 +154,7 @@ void handle_client(int client_socket) {
                 std::vector<std::string> check = splitString(parts[i],'\n');
                 int len1 = std::stoi(check[0]);
                 int len2 = check[1].size();
-                if(len1 == len2) {manage(check[1],client_socket);}
+                if(len1 == len2) {manage(check[1],client_socket, ip, port);}
             }
             prebuffer = parts[parts.size()-1];
             
@@ -189,10 +190,18 @@ int main() {
         exit(1);
     }
 
-    while (true) {
+    
+     while (true) {
         int client_socket = accept(server_socket, nullptr, nullptr);
         if (client_socket > 0) {
-            std::thread client_thread(handle_client, client_socket);
+            sockaddr_in client_address;
+            socklen_t client_address_len = sizeof(client_address);
+            getpeername(client_socket, reinterpret_cast<struct sockaddr*>(&client_address), &client_address_len);
+
+            std::string ip_address = inet_ntoa(client_address.sin_addr);
+            int port = ntohs(client_address.sin_port);
+
+            std::thread client_thread(handle_client, client_socket, ip_address, port);
             client_thread.detach();
         }
     }
