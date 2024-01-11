@@ -21,18 +21,46 @@
 //#define FILENAME "pomiary.txt"
 #define SEQUENCE "@"
 
-std::mutex file_mutex;
-std::queue<std::pair<std::string, std::string>> write_queue; // A queue to hold data to be written
-
+#include <iostream>
+#include <fstream>
+#include <chrono>
+#include <thread>
+#include <mutex>
+#include <queue>
+#include <string>
 
 const std::string FILENAME = "output_";
 const int MAX_FILE_SIZE_MB = 10;
 const int MAX_TIME_DIFF_SECONDS = 60;
+const std::string FILE_NUMBER_FILENAME = "file_number.txt";
 
+std::mutex file_mutex;
+std::queue<std::pair<std::string, std::string>> write_queue;
+
+int readCurrentFileNumber() {
+    std::ifstream fileNumberFile(FILE_NUMBER_FILENAME);
+    int current_file_number = 1;
+
+    if (fileNumberFile.is_open()) {
+        fileNumberFile >> current_file_number;
+        fileNumberFile.close();
+    }
+
+    return current_file_number;
+}
+
+void writeCurrentFileNumber(int current_file_number) {
+    std::ofstream fileNumberFile(FILE_NUMBER_FILENAME);
+
+    if (fileNumberFile.is_open()) {
+        fileNumberFile << current_file_number;
+        fileNumberFile.close();
+    }
+}
 
 void write_thread_function() {
     std::ofstream file;
-    int current_file_number = 1;
+    int current_file_number = readCurrentFileNumber();
     std::chrono::steady_clock::time_point last_write_time = std::chrono::steady_clock::now();
 
     while (true) {
@@ -44,6 +72,7 @@ void write_thread_function() {
                  std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - last_write_time).count() > MAX_TIME_DIFF_SECONDS)) {
                 file.close();
                 current_file_number++;
+                writeCurrentFileNumber(current_file_number);
             }
 
             if (!file.is_open()) {
@@ -68,6 +97,9 @@ void write_thread_function() {
         file.close();
     }
 }
+
+
+
 
 
 
