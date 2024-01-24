@@ -91,6 +91,74 @@ void send_data(int server_socket, char *data) {
     }
 }
 
+#ifdef TEST 
+
+int main(int argc, char* argv[]){
+    int id_node = 0;
+    int guid = ram_guid;
+    if(argc >= 2) {
+      id_node = atoi(argv[1]);  
+    }
+    if(argc >= 3) { //if guid=0, client sends ram, if guid=1 client sends cpu
+        guid = atoi(argv[2]);
+    }
+
+
+    int client_socket = socket(AF_INET, SOCK_STREAM, 0);
+    if (client_socket == -1) {
+        perror("Client socket error");
+        exit(1);
+    }
+
+    struct sockaddr_in server_address;
+    server_address.sin_family = AF_INET;
+    server_address.sin_port = htons(SERVER_PORT);
+    server_address.sin_addr.s_addr = INADDR_ANY;
+
+    if (connect(client_socket, (struct sockaddr*)&server_address, sizeof(server_address)) < 0) {
+        perror("Server connection error");
+        exit(1);
+    }
+
+    char buffer[BUFFER_SIZE];
+
+    char * tests [] = {"test1", "test2", "test3", "test4"};
+
+    for(int i = 0; i < 4; i++) {
+        memset(buffer, 0, sizeof(buffer));
+
+        // Receive data from the server
+        if (recv(client_socket, buffer, sizeof(buffer) - 1, 0) <= 0) {
+            perror("Error receiving command from server");
+            break;
+        }
+
+        // Check if the received command is "GATHER_INFO"
+        if (strcmp(buffer, "GATHER_INFO") == 0) {
+            if(CONST_DATA) {
+              // Send data to the server
+    char* data_to_send = tests[i];
+      //"{ \"headers\": { \"node_id\": 7, \"plugin_id\":2, \"data_type\": \"b\" }, \"data_list\": [ { \"time\": 4, \"data\": \"abc\" }, { \"time\": 1, \"data\": \"abdc\" } ] }";
+              send_data(client_socket, data_to_send);
+              memset(buffer, 0, sizeof(buffer)); // Clear the buffer
+            } else {
+              char *data;
+              data = tests[i];
+                  //data = get_data_plugin(guid,id_node);
+              send_data(client_socket, data);
+              free(data);
+            }
+        }
+
+        // Maybe add a delay to avoid constant checking and reduce CPU usage??
+        // sleep(1);
+    }
+
+    close(client_socket);
+    return 0;
+}
+
+#else 
 
 int main(int argc, char* argv[]){
     int id_node = 0;
@@ -152,3 +220,5 @@ int main(int argc, char* argv[]){
     close(client_socket);
     return 0;
 }
+
+#endif

@@ -17,15 +17,10 @@
 
 #define SERVER_PORT 12345
 #define BUFFER_SIZE 1024
-#define PULL_TIME 10
+#define PULL_TIME 1
 //#define FILENAME "pomiary.txt"
 #define SEQUENCE "@"
 
-#include <iostream>
-#include <fstream>
-#include <chrono>
-#include <thread>
-#include <mutex>
 #include <queue>
 #include <string>
 
@@ -131,6 +126,96 @@ void send_info(int client_socket) {
     send(client_socket, message, strlen(message), 0);
 }
 
+#ifdef TEST 
+
+int j = 0;
+
+void handle_client(int client_socket, std::string ip, int port) {
+    char buffer[BUFFER_SIZE];
+    std::string prebuffer = "";
+    bool z = false;
+
+    send_info(client_socket);
+
+    char * test[] = {"test1", "test2", "test3", "test4", "test5"};
+
+    while(j < 4) {
+        memset(buffer, 0, sizeof(buffer));
+
+        fd_set read_fds;
+        FD_ZERO(&read_fds);
+        FD_SET(client_socket, &read_fds);
+
+        auto start_time = std::chrono::steady_clock::now();
+        std::chrono::seconds timeout(PULL_TIME);
+
+        struct timeval timeval_timeout;
+        timeval_timeout.tv_sec = PULL_TIME;
+        timeval_timeout.tv_usec = 0;
+
+        int result = select(client_socket + 1, &read_fds, nullptr, nullptr, &timeval_timeout);
+
+        if (result == -1) {
+            perror("Error in select");
+            break;
+        } else if (result == 0) {
+            // Timeout occurred, no data received within PULL_TIME seconds
+            send_info(client_socket);
+            if (!z) {
+                std::cout << "No data received within " << PULL_TIME << " seconds. Continuing..." << std::endl;
+            }
+            z = false;
+            continue;
+        } else {
+            // Data is available, receive it
+            if (recv(client_socket, buffer, sizeof(buffer) - 1, 0) <= 0) {
+                perror("Error receiving data from client");
+                break;
+            }
+            std::string Sbuffer = std::string(buffer);
+            std::vector<std::string> parts = splitString(Sbuffer,'@');
+            int end = 0;
+            if (Sbuffer[Sbuffer.size()-1]=='@'){
+                end=1;
+            }
+            parts[0] = prebuffer + parts[0];
+
+            for(int i = 0; i < parts.size()-1; i++){
+                std::vector<std::string> check = splitString(parts[i],'\n');
+                int len1 = std::stoi(check[0]);
+                int len2 = check[1].size();
+                if(len1 == len2) {
+                  // manage(check[1],client_socket, ip, port);
+                  
+                  if (check[1] == test[j]) {
+                    //std::cout << "SUKCES\n";
+                    if (j == 3) {
+                      std::cout << "SUKCES\n";
+                      exit(0);
+                    }
+                  }
+                  else {
+                    std::cout << "ERROR\n";//\nIn test number " << j << "\nAborting\n" << std::endl;
+                    close(client_socket);
+                    exit(1);
+                  }
+
+                  j++;
+
+                  //std::cout << check[1] << std::endl;
+                }
+            }
+            prebuffer = parts[parts.size()-1];
+            
+            z = true;
+        }
+    }
+
+    close(client_socket);
+}
+
+#else
+
 void handle_client(int client_socket, std::string ip, int port) {
     std::cout << "Client connected. Socket: " << client_socket << std::endl;
 
@@ -197,7 +282,9 @@ void handle_client(int client_socket, std::string ip, int port) {
     close(client_socket);
 }
 
-int main() {
+#endif
+
+int main () {
     std::thread writer_thread(write_thread_function);
     writer_thread.detach();  // Detach the writing thread
 
@@ -241,4 +328,3 @@ int main() {
     close(server_socket);
     return 0;
 }
-
